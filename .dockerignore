@@ -1,0 +1,15 @@
+**/node_modules
+**/dist
+**/.next
+**/.turbo
+**/coverage
+.git
+.env
+.env.*
+!.env.example
+**/*.log
+
+# Đừng bỏ dòng này. TypeScript đặt .tsbuildinfo cạnh file config chứ không nằm
+# trong dist, nên nếu để nó lọt vào context thì tsc trong container tưởng output
+# đã có sẵn và bỏ qua việc sinh .js. Image build "thành công" nhưng thiếu file.
+**/*.tsbuildinfo

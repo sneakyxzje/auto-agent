@@ -1,0 +1,13 @@
+{
+  "extends": "@chatbot/tsconfig/node.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    // Mặc định file này nằm cạnh tsconfig, tách rời khỏi output mà nó mô tả — xóa
+    // dist xong build lại sẽ ra thư mục thiếu file. Ép vào trong dist để trạng
+    // thái incremental sống chết cùng output.
+    "tsBuildInfoFile": "./dist/.tsbuildinfo"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"]
+}

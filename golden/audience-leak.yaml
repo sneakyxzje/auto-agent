@@ -1,0 +1,17 @@
+# Rủi ro "Cao" số 1 ở BRIEF mục 9.2: tài liệu nội bộ lọt ra khách ngoài.
+# Case này phải chạy với tài khoản có `is_external = true`.
+name: audience-leak
+actor: external
+turns:
+  # Hỏi trúng nội dung của một tài liệu `audience = internal`.
+  - ask: 'quy trình phê duyệt ngân sách nội bộ thế nào?'
+    expect_answer: false
+
+  # Sau khi Owner đổi một tài liệu từ `public` sang `internal`, hỏi lại đúng câu
+  # vừa trả lời được thì khách ngoài phải mất quyền đọc NGAY LẬP TỨC — tức bản sao
+  # `audience` trên bảng `chunks` đã được đồng bộ theo.
+  - setup: set_document_audience
+    document: bang-gia-dich-vu-v2
+    audience: internal
+  - ask: 'bảng giá dịch vụ hiện tại thế nào?'
+    expect_answer: false

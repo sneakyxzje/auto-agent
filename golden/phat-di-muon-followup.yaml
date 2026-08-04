@@ -1,0 +1,26 @@
+# Kịch bản 4 lượt ở BRIEF mục FR-3.1 — case nghiệm thu bắt buộc của B1.
+# Mỗi case là MỘT HỘI THOẠI NHIỀU LƯỢT, không phải câu hỏi rời: golden set chỉ có
+# câu hỏi đơn lẻ thì toàn bộ FR-3.1 không được bảo vệ khỏi hồi quy.
+name: phat-di-muon-followup
+turns:
+  - ask: '/account đi muộn 30p thì phạt bao nhiêu'
+    expect_answer: true
+    expect_department: account
+    expect_doc: noi-quy-lao-dong-v3
+
+  # Lọc phòng ban là "dính" — không gõ lại lệnh mà vẫn phải tìm trong phòng account.
+  - ask: 'vậy 1 tiếng thì sao'
+    expect_answer: true
+    expect_department: account
+    expect_rewritten_contains: ['đi muộn', '1 tiếng']
+
+  - ask: 'còn nghỉ không phép?'
+    expect_answer: true
+    expect_department: account
+
+  # Người dùng chủ động đổi phòng ⇒ câu hỏi độc lập, TUYỆT ĐỐI không ghép ngữ cảnh cũ.
+  - ask: '/hr quy trình xin nghỉ phép'
+    expect_answer: true
+    expect_department: hr
+    expect_is_followup: false
+    expect_rewritten_not_contains: ['đi muộn']

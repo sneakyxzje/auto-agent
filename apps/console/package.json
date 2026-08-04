@@ -1,0 +1,25 @@
+{
+  "name": "@chatbot/console",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev --port 3000",
+    "start": "next start --port 3000",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@chatbot/chat-core": "workspace:*",
+    "@chatbot/contracts": "workspace:*",
+    "next": "^15.5.2",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@chatbot/tsconfig": "workspace:*",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "typescript": "^5.9.2"
+  }
+}

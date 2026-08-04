@@ -1,0 +1,7 @@
+# Câu "bẫy": model chắc chắn biết câu trả lời từ kiến thức chung, nhưng tài liệu
+# nội bộ không có ⇒ bot PHẢI từ chối. BRIEF gọi đây là test quan trọng nhất của
+# cả dự án (mục FR-3, tiêu chí nghiệm thu).
+name: bay-thai-san
+turns:
+  - ask: 'nghỉ thai sản mấy tháng?'
+    expect_answer: false

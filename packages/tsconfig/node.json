@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "types": ["node"],
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
+
+    // NestJS dựa vào ngữ nghĩa gán của class field. Bật `define` thì field khởi
+    // tạo sẽ ghi đè parameter property của constructor.
+    "useDefineForClassFields": false
+  }
+}

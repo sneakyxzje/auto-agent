@@ -1,0 +1,34 @@
+{
+  "name": "@chatbot/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx watch src/main.ts",
+    "dev:worker": "tsx watch src/main.worker.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "verify:isolation": "node scripts/verify-tenant-isolation.mjs"
+  },
+  "dependencies": {
+    "@chatbot/contracts": "workspace:*",
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/core": "^11.1.6",
+    "@nestjs/platform-fastify": "^11.1.6",
+    "drizzle-orm": "^0.44.5",
+    "pg": "^8.16.3",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@chatbot/tsconfig": "workspace:*",
+    "@types/node": "^22.15.0",
+    "@types/pg": "^8.15.5",
+    "drizzle-kit": "^0.31.4",
+    "tsx": "^4.20.4",
+    "typescript": "^5.9.2"
+  }
+}
