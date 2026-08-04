@@ -9,3 +9,17 @@ packages:
 allowBuilds:
   esbuild: true
   sharp: true
+
+# @nestjs/platform-fastify và @fastify/cookie chốt hai bản fastify khác nhau. Hai
+# bản khai báo kiểu song song khiến TypeScript coi chúng là hai thư viện riêng, và
+# phần mở rộng kiểu của @fastify/cookie (setCookie, request.cookies) không áp được
+# vào bản mà code đang dùng. Ép cả workspace về đúng một bản.
+overrides:
+  fastify: 5.11.2
+
+# @fastify/cookie mở rộng kiểu của fastify bằng `declare module 'fastify'`, nhưng
+# nó không khai fastify là peerDependency nên pnpm không link fastify vào thư mục
+# của nó — không resolve được thì phần mở rộng kiểu không áp vào đâu cả. Đẩy
+# fastify ra node_modules gốc để plugin nhìn thấy.
+publicHoistPattern:
+  - fastify
