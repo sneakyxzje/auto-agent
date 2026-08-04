@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 // Trang tạm, sẽ bị các màn hình thật thay chỗ.
 
 const PLANNED_SCREENS = [
@@ -11,8 +13,12 @@ const PLANNED_SCREENS = [
 const HomePage = () => (
   <main style={{ maxWidth: '48rem', margin: '0 auto', padding: '3rem 1.5rem' }}>
     <h1>Chatbot nội bộ — Console</h1>
-    <p>Khung dự án đã chạy. Các màn hình dưới đây chưa được triển khai.</p>
 
+    <p>
+      <Link href="/login">Đăng nhập</Link> · <Link href="/register">Đăng ký</Link>
+    </p>
+
+    <p>Các màn hình dưới đây chưa được triển khai.</p>
     <ul>
       {PLANNED_SCREENS.map((screen) => (
         <li key={screen.path}>
