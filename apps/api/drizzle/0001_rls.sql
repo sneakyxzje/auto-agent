@@ -14,8 +14,19 @@
 -- FORCE để chính chủ sở hữu bảng cũng bị chặn. Riêng superuser thì Postgres luôn
 -- cho qua, nên ứng dụng bắt buộc chạy bằng role thường (xem docker/postgres/init).
 
+-- chatbot_auth chạm được đúng ba bảng này, vì cả ba đều phải đọc/ghi được khi
+-- chưa biết người dùng thuộc công ty nào: đăng nhập, tạo công ty, và nhập mã mời.
 GRANT SELECT, INSERT, UPDATE ON "users" TO chatbot_auth;--> statement-breakpoint
 GRANT SELECT, INSERT ON "tenants" TO chatbot_auth;--> statement-breakpoint
+GRANT SELECT, UPDATE ON "invitations" TO chatbot_auth;--> statement-breakpoint
+
+ALTER TABLE "invitations" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "invitations" FORCE ROW LEVEL SECURITY;--> statement-breakpoint
+CREATE POLICY "invitations_app_isolation" ON "invitations" TO chatbot_app
+  USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid)
+  WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);--> statement-breakpoint
+CREATE POLICY "invitations_auth_lookup" ON "invitations" TO chatbot_auth
+  USING (true) WITH CHECK (true);--> statement-breakpoint
 
 ALTER TABLE "tenants" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
 ALTER TABLE "tenants" FORCE ROW LEVEL SECURITY;--> statement-breakpoint

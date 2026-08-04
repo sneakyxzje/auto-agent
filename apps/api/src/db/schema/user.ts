@@ -10,21 +10,22 @@ import {
 } from 'drizzle-orm/pg-core';
 import { departments } from './department';
 import { membershipRoleEnum, userStatusEnum } from './enums';
-import { tenantIdColumn } from './tenant';
+import { tenantIdColumn, tenants } from './tenant';
 
 /**
  * Email duy nhất trên toàn hệ thống chứ không phải trong từng khách hàng: đăng
  * nhập chỉ có email + mật khẩu, nên phải tra ra được đúng một tài khoản mà không
  * cần hỏi người dùng họ thuộc công ty nào.
  *
- * `isExternal` mặc định `true`. Người mới đăng ký luôn là khách ngoài, chỉ đọc
- * được tài liệu `public`; muốn thành nhân viên phải có admin của công ty duyệt.
+ * `tenantId` để rỗng được, vì đăng ký xong là đã có tài khoản nhưng chưa chọn tạo
+ * công ty hay vào công ty bằng mã mời. Trong lúc rỗng, mọi policy RLS đều không
+ * khớp nên họ không thấy dữ liệu của bất kỳ công ty nào — không cần luật riêng.
  */
 export const users = pgTable(
   'users',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    tenantId: tenantIdColumn(),
+    tenantId: uuid('tenant_id').references(() => tenants.id, { onDelete: 'restrict' }),
     email: varchar('email', { length: 320 }).notNull(),
     passwordHash: text('password_hash').notNull(),
     displayName: varchar('display_name', { length: 255 }).notNull(),

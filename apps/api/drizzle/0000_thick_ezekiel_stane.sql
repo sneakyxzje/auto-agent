@@ -127,6 +127,20 @@ CREATE TABLE "message_attachments" (
 	CONSTRAINT "message_attachments_message_id_image_asset_id_pk" PRIMARY KEY("message_id","image_asset_id")
 );
 --> statement-breakpoint
+CREATE TABLE "invitations" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"tenant_id" uuid NOT NULL,
+	"code" varchar(32) NOT NULL,
+	"max_uses" integer DEFAULT 1 NOT NULL,
+	"used_count" integer DEFAULT 0 NOT NULL,
+	"expires_at" timestamp with time zone NOT NULL,
+	"revoked_at" timestamp with time zone,
+	"grants_tenant_admin" boolean DEFAULT false NOT NULL,
+	"created_by" uuid,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "invitations_code_unique" UNIQUE("code")
+);
+--> statement-breakpoint
 CREATE TABLE "message_ratings" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"tenant_id" uuid NOT NULL,
@@ -178,7 +192,7 @@ CREATE TABLE "department_memberships" (
 --> statement-breakpoint
 CREATE TABLE "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"tenant_id" uuid NOT NULL,
+	"tenant_id" uuid,
 	"email" varchar(320) NOT NULL,
 	"password_hash" text NOT NULL,
 	"display_name" varchar(255) NOT NULL,
@@ -211,6 +225,8 @@ ALTER TABLE "image_assets" ADD CONSTRAINT "image_assets_tenant_id_tenants_id_fk"
 ALTER TABLE "message_attachments" ADD CONSTRAINT "message_attachments_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "message_attachments" ADD CONSTRAINT "message_attachments_message_id_messages_id_fk" FOREIGN KEY ("message_id") REFERENCES "public"."messages"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "message_attachments" ADD CONSTRAINT "message_attachments_image_asset_id_image_assets_id_fk" FOREIGN KEY ("image_asset_id") REFERENCES "public"."image_assets"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "invitations" ADD CONSTRAINT "invitations_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "invitations" ADD CONSTRAINT "invitations_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "message_ratings" ADD CONSTRAINT "message_ratings_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "message_ratings" ADD CONSTRAINT "message_ratings_message_id_messages_id_fk" FOREIGN KEY ("message_id") REFERENCES "public"."messages"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "messages" ADD CONSTRAINT "messages_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
@@ -230,6 +246,7 @@ CREATE INDEX "escalation_tickets_department_status_idx" ON "escalation_tickets" 
 CREATE INDEX "escalation_tickets_status_due_idx" ON "escalation_tickets" USING btree ("status","due_at");--> statement-breakpoint
 CREATE INDEX "knowledge_candidates_status_created_idx" ON "knowledge_candidates" USING btree ("tenant_id","status","created_at");--> statement-breakpoint
 CREATE INDEX "image_assets_expires_at_idx" ON "image_assets" USING btree ("expires_at");--> statement-breakpoint
+CREATE INDEX "invitations_tenant_idx" ON "invitations" USING btree ("tenant_id","created_at");--> statement-breakpoint
 CREATE INDEX "messages_conversation_created_idx" ON "messages" USING btree ("conversation_id","created_at");--> statement-breakpoint
 CREATE INDEX "messages_tenant_created_idx" ON "messages" USING btree ("tenant_id","created_at");--> statement-breakpoint
 CREATE INDEX "department_memberships_department_role_idx" ON "department_memberships" USING btree ("tenant_id","department_id","role");--> statement-breakpoint

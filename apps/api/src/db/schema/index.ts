@@ -5,6 +5,7 @@ export * from './document';
 export * from './enums';
 export * from './escalation';
 export * from './image';
+export * from './invitation';
 export * from './message';
 export * from './tenant';
 export * from './types';
