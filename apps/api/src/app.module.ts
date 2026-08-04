@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from './config/config.module';
+import { AuthModule } from './core/auth/auth.module';
 import { DrizzleModule } from './db/drizzle.module';
 import { HealthModule } from './health/health.module';
+import { RedisModule } from './redis/redis.module';
 
 /**
  * Bốn module nghiệp vụ sẽ thêm dần: core (user, department, JWT, rate limit),
@@ -12,6 +14,6 @@ import { HealthModule } from './health/health.module';
  * tố /api/v1 đặt tập trung ở main.ts.
  */
 @Module({
-  imports: [ConfigModule, DrizzleModule, HealthModule],
+  imports: [ConfigModule, DrizzleModule, RedisModule, AuthModule, HealthModule],
 })
 export class AppModule {}

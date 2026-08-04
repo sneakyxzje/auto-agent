@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 
+import fastifyCookie from '@fastify/cookie';
 import { Logger, RequestMethod, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
@@ -17,6 +18,9 @@ const bootstrap = async (): Promise<void> => {
     AppModule,
     new FastifyAdapter({ bodyLimit: MAX_UPLOAD_BYTES }),
   );
+
+  // Fastify không tự đọc cookie, phải đăng ký plugin thì `request.cookies` mới có.
+  await app.register(fastifyCookie);
 
   // Dạng chuỗi `exclude: ['health']` không có tác dụng, phải khai đủ path + method.
   // Vế còn lại là VERSION_NEUTRAL trên controller, thiếu nó route vẫn dính /v1.
