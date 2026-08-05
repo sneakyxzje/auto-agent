@@ -62,7 +62,9 @@ export const streamSse = async ({
     headers: {
       'content-type': 'application/json',
       accept: 'text/event-stream',
-      ...(accessToken !== undefined ? { authorization: `Bearer ${accessToken}` } : {}),
+      ...(accessToken !== undefined
+        ? { authorization: `Bearer ${accessToken}` }
+        : {}),
     },
     body: JSON.stringify(body),
     signal,
@@ -73,7 +75,9 @@ export const streamSse = async ({
   }
 
   if (response.body === null) {
-    throw new Error('Phản hồi SSE không có body — kiểm tra `proxy_buffering off` ở nginx');
+    throw new Error(
+      'Phản hồi SSE không có body — kiểm tra `proxy_buffering off` ở nginx',
+    );
   }
 
   const reader = response.body.getReader();

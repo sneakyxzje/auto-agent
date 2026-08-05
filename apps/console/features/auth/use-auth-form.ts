@@ -38,7 +38,9 @@ export const useAuthForm = <TInput>({
     });
   };
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleSubmit = async (
+    event: FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     event.preventDefault();
     setFormError(null);
 
@@ -46,7 +48,10 @@ export const useAuthForm = <TInput>({
     if (!parsed.success) {
       setFieldErrors(
         Object.fromEntries(
-          parsed.error.issues.map((issue) => [issue.path.join('.'), issue.message]),
+          parsed.error.issues.map((issue) => [
+            issue.path.join('.'),
+            issue.message,
+          ]),
         ),
       );
       return;

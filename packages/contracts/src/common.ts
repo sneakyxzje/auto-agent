@@ -24,7 +24,10 @@ export const departmentSlugSchema = z
   .string()
   .min(1)
   .max(64)
-  .regex(/^[a-z0-9-]+$/, 'Chỉ cho phép chữ thường không dấu, chữ số và dấu gạch ngang')
+  .regex(
+    /^[a-z0-9-]+$/,
+    'Chỉ cho phép chữ thường không dấu, chữ số và dấu gạch ngang',
+  )
   .refine((slug) => !isReservedSlug(slug), {
     message: `Không được dùng từ khóa hệ thống: ${RESERVED_DEPARTMENT_SLUGS.join(', ')}`,
   });

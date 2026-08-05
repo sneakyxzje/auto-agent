@@ -37,7 +37,9 @@ export const loadDotEnvFile = (startDirectory: string = __dirname): void => {
 // Chỉ hạ tầng ở đây. Ngưỡng nghiệp vụ (top_k, SLA, rate limit, prompt...) nằm
 // trong bảng config runtime vì phải đổi được lúc chạy, không deploy lại.
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  NODE_ENV: z
+    .enum(['development', 'test', 'production'])
+    .default('development'),
   API_PORT: z.coerce.number().int().positive().default(3001),
 
   // Ba role khác nhau cho ba mức quyền, đừng dùng lẫn. Xem drizzle/0001_rls.sql.
@@ -73,7 +75,9 @@ const envSchema = z.object({
 export type Env = z.infer<typeof envSchema>;
 
 const formatIssues = (error: z.ZodError): string =>
-  error.issues.map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`).join('\n');
+  error.issues
+    .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
+    .join('\n');
 
 let cached: Env | null = null;
 
@@ -84,7 +88,9 @@ export const loadEnv = (): Env => {
 
   const parsed = envSchema.safeParse(process.env);
   if (!parsed.success) {
-    throw new Error(`Biến môi trường không hợp lệ:\n${formatIssues(parsed.error)}`);
+    throw new Error(
+      `Biến môi trường không hợp lệ:\n${formatIssues(parsed.error)}`,
+    );
   }
 
   cached = parsed.data;

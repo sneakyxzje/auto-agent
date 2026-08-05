@@ -50,7 +50,9 @@ export const chunks = pgTable(
     docStatus: documentStatusEnum('doc_status').notNull(),
     effectiveTo: timestamp('effective_to', { withTimezone: true }),
 
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     unique('chunks_document_ord_key').on(table.documentId, table.ord),
@@ -64,8 +66,14 @@ export const chunks = pgTable(
     // Index vector không nhét tenant_id vào được, nên việc lọc theo khách hàng đè
     // hoàn toàn lên mệnh đề WHERE. Bắt buộc bật hnsw.iterative_scan khi truy vấn,
     // không thì một khách ít tài liệu sẽ bị lọc sạch ứng viên.
-    index('chunks_embedding_idx').using('hnsw', table.embedding.op('vector_cosine_ops')),
-    index('chunks_content_norm_idx').using('gin', table.contentNorm.op('gin_trgm_ops')),
+    index('chunks_embedding_idx').using(
+      'hnsw',
+      table.embedding.op('vector_cosine_ops'),
+    ),
+    index('chunks_content_norm_idx').using(
+      'gin',
+      table.contentNorm.op('gin_trgm_ops'),
+    ),
   ],
 );
 

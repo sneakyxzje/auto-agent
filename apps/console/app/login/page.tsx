@@ -33,8 +33,14 @@ const LoginPage = () => {
         </>
       }
     >
-      <form className={authFormClassName} onSubmit={form.handleSubmit} noValidate>
-        {form.formError !== null && <Alert tone="danger">{form.formError}</Alert>}
+      <form
+        className={authFormClassName}
+        onSubmit={form.handleSubmit}
+        noValidate
+      >
+        {form.formError !== null && (
+          <Alert tone="danger">{form.formError}</Alert>
+        )}
 
         <TextField
           label="Email"

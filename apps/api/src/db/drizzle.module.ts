@@ -33,7 +33,8 @@ export type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
   providers: [
     {
       provide: PG_POOL,
-      useFactory: (env: Env): Pool => new Pool({ connectionString: env.DATABASE_URL, max: 10 }),
+      useFactory: (env: Env): Pool =>
+        new Pool({ connectionString: env.DATABASE_URL, max: 10 }),
       inject: [ENV],
     },
     {
@@ -44,7 +45,9 @@ export type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
     {
       provide: AUTH_DATABASE,
       useFactory: (env: Env): Database =>
-        drizzle(new Pool({ connectionString: env.DATABASE_AUTH_URL, max: 4 }), { schema }),
+        drizzle(new Pool({ connectionString: env.DATABASE_AUTH_URL, max: 4 }), {
+          schema,
+        }),
       inject: [ENV],
     },
   ],
@@ -73,7 +76,9 @@ export class DrizzleModule implements OnModuleInit, OnModuleDestroy {
     const version = rows[0]?.extversion;
 
     if (version === undefined) {
-      throw new Error('Chưa cài extension `vector`. Kiểm tra docker/postgres/init.sql.');
+      throw new Error(
+        'Chưa cài extension `vector`. Kiểm tra docker/postgres/init.sql.',
+      );
     }
 
     this.assertIterativeScanAvailable(version);

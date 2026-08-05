@@ -14,7 +14,11 @@ import {
 import { conversations } from './conversation';
 import { messageRoleEnum, ratingEnum } from './enums';
 import { tenantIdColumn } from './tenant';
-import type { CostBreakdown, LatencyBreakdown, RetrievedChunkRef } from './types';
+import type {
+  CostBreakdown,
+  LatencyBreakdown,
+  RetrievedChunkRef,
+} from './types';
 
 export const messages = pgTable(
   'messages',
@@ -44,10 +48,15 @@ export const messages = pgTable(
     latencyBreakdown: jsonb('latency_breakdown').$type<LatencyBreakdown>(),
     costBreakdown: jsonb('cost_breakdown').$type<CostBreakdown>(),
 
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
-    index('messages_conversation_created_idx').on(table.conversationId, table.createdAt),
+    index('messages_conversation_created_idx').on(
+      table.conversationId,
+      table.createdAt,
+    ),
     // Cộng dồn chi phí LLM theo từng khách hàng, sau này còn để xuất hóa đơn.
     index('messages_tenant_created_idx').on(table.tenantId, table.createdAt),
   ],
@@ -69,9 +78,16 @@ export const messageRatings = pgTable(
     rating: ratingEnum('rating').notNull(),
     comment: text('comment'),
     ratedBy: varchar('rated_by', { length: 255 }).notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
-  (table) => [unique('message_ratings_message_rater_key').on(table.messageId, table.ratedBy)],
+  (table) => [
+    unique('message_ratings_message_rater_key').on(
+      table.messageId,
+      table.ratedBy,
+    ),
+  ],
 );
 
 export type Message = typeof messages.$inferSelect;

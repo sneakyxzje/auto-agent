@@ -51,7 +51,9 @@ export class JwtGuard implements CanActivate {
      * chỉ giúp ích cho người đang dò.
      */
     if (claims === null) {
-      throw new UnauthorizedException('Phiên đăng nhập không hợp lệ hoặc đã hết hạn');
+      throw new UnauthorizedException(
+        'Phiên đăng nhập không hợp lệ hoặc đã hết hạn',
+      );
     }
 
     attachCurrentUser(request, claims);

@@ -3,7 +3,10 @@ import 'reflect-metadata';
 import fastifyCookie from '@fastify/cookie';
 import { Logger, RequestMethod, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
+import {
+  FastifyAdapter,
+  type NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 import { loadEnv } from './config/env';
 

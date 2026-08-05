@@ -10,12 +10,16 @@ const CURRENT_USER = Symbol('currentUser');
 
 type RequestWithUser = FastifyRequest & { [CURRENT_USER]?: AccessTokenClaims };
 
-export const attachCurrentUser = (request: FastifyRequest, claims: AccessTokenClaims): void => {
+export const attachCurrentUser = (
+  request: FastifyRequest,
+  claims: AccessTokenClaims,
+): void => {
   (request as RequestWithUser)[CURRENT_USER] = claims;
 };
 
-export const readCurrentUser = (request: FastifyRequest): AccessTokenClaims | undefined =>
-  (request as RequestWithUser)[CURRENT_USER];
+export const readCurrentUser = (
+  request: FastifyRequest,
+): AccessTokenClaims | undefined => (request as RequestWithUser)[CURRENT_USER];
 
 /**
  * Lấy thông tin người đang gọi trong controller: `@CurrentUser() user: AccessTokenClaims`.
@@ -29,7 +33,9 @@ export const CurrentUser = createParamDecorator(
     const user = readCurrentUser(request);
 
     if (user === undefined) {
-      throw new Error('Route dùng @CurrentUser() nhưng thiếu @UseGuards(JwtGuard)');
+      throw new Error(
+        'Route dùng @CurrentUser() nhưng thiếu @UseGuards(JwtGuard)',
+      );
     }
 
     return user;

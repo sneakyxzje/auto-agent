@@ -8,8 +8,12 @@ export const tenants = pgTable('tenants', {
   /** Dành sẵn cho subdomain kiểu `congty-a.chatbot.com`. */
   slug: varchar('slug', { length: 64 }).notNull().unique(),
   status: tenantStatusEnum('status').notNull().default('active'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 /**

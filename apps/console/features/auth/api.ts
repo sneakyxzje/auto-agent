@@ -13,4 +13,5 @@ export const register = (input: RegisterInput): Promise<AuthResponse> =>
 export const login = (input: LoginInput): Promise<AuthResponse> =>
   postJson<AuthResponse>('/v1/auth/login', input);
 
-export const logout = (): Promise<AuthResponse> => postJson<AuthResponse>('/v1/auth/logout', {});
+export const logout = (): Promise<AuthResponse> =>
+  postJson<AuthResponse>('/v1/auth/logout', {});

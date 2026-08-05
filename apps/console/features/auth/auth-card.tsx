@@ -13,7 +13,12 @@ type AuthCardProps = {
  * layout của Next: ít phép màu hơn, và tránh luôn lỗi của Next với thư mục có dấu
  * ngoặc trên Windows.
  */
-export const AuthCard = ({ title, subtitle, children, footer }: AuthCardProps) => (
+export const AuthCard = ({
+  title,
+  subtitle,
+  children,
+  footer,
+}: AuthCardProps) => (
   <div className={styles.screen}>
     <div className={styles.card}>
       <h1 className={styles.title}>{title}</h1>

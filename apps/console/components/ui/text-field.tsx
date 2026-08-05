@@ -35,7 +35,11 @@ export const TextField = ({
         id={id}
         name={name}
         type={type}
-        className={error === undefined ? styles.input : `${styles.input} ${styles.invalid}`}
+        className={
+          error === undefined
+            ? styles.input
+            : `${styles.input} ${styles.invalid}`
+        }
         value={value}
         onChange={(event) => onChange(event.target.value)}
         autoComplete={autoComplete}

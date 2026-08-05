@@ -21,6 +21,8 @@ export const withTenant = async <T>(
   work: (tx: Transaction) => Promise<T>,
 ): Promise<T> =>
   db.transaction(async (tx) => {
-    await tx.execute(sql`SELECT set_config('app.tenant_id', ${tenantId}, true)`);
+    await tx.execute(
+      sql`SELECT set_config('app.tenant_id', ${tenantId}, true)`,
+    );
     return work(tx);
   });

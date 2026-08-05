@@ -25,7 +25,9 @@ export const users = pgTable(
   'users',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    tenantId: uuid('tenant_id').references(() => tenants.id, { onDelete: 'restrict' }),
+    tenantId: uuid('tenant_id').references(() => tenants.id, {
+      onDelete: 'restrict',
+    }),
     email: varchar('email', { length: 320 }).notNull(),
     passwordHash: text('password_hash').notNull(),
     displayName: varchar('display_name', { length: 255 }).notNull(),
@@ -34,8 +36,12 @@ export const users = pgTable(
     isTenantAdmin: boolean('is_tenant_admin').notNull().default(false),
     status: userStatusEnum('status').notNull().default('active'),
     lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     unique('users_email_key').on(table.email),
@@ -56,10 +62,15 @@ export const departmentMemberships = pgTable(
       .notNull()
       .references(() => departments.id, { onDelete: 'cascade' }),
     role: membershipRoleEnum('role').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
-    unique('department_memberships_user_department_key').on(table.userId, table.departmentId),
+    unique('department_memberships_user_department_key').on(
+      table.userId,
+      table.departmentId,
+    ),
     // Cho truy vấn "phòng X có những Owner nào" khi gán phiếu escalation.
     index('department_memberships_department_role_idx').on(
       table.tenantId,

@@ -1,6 +1,18 @@
-import { index, integer, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import {
+  index,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core';
 import { departments } from './department';
-import { audienceEnum, documentSourceTypeEnum, documentStatusEnum } from './enums';
+import {
+  audienceEnum,
+  documentSourceTypeEnum,
+  documentStatusEnum,
+} from './enums';
 import { tenantIdColumn } from './tenant';
 
 /**
@@ -19,7 +31,9 @@ export const documents = pgTable(
       .references(() => departments.id, { onDelete: 'restrict' }),
     title: varchar('title', { length: 512 }).notNull(),
     audience: audienceEnum('audience').notNull().default('internal'),
-    sourceType: documentSourceTypeEnum('source_type').notNull().default('upload'),
+    sourceType: documentSourceTypeEnum('source_type')
+      .notNull()
+      .default('upload'),
     version: integer('version').notNull().default(1),
     status: documentStatusEnum('status').notNull().default('draft'),
     effectiveFrom: timestamp('effective_from', { withTimezone: true }),
@@ -29,11 +43,19 @@ export const documents = pgTable(
     /** Đường dẫn trong S3/MinIO. */
     fileRef: text('file_ref'),
     uploadedBy: varchar('uploaded_by', { length: 255 }),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
-    index('documents_department_status_idx').on(table.tenantId, table.departmentId, table.status),
+    index('documents_department_status_idx').on(
+      table.tenantId,
+      table.departmentId,
+      table.status,
+    ),
     index('documents_sha256_idx').on(table.tenantId, table.fileSha256),
     // Cho báo cáo tài liệu sắp/đã hết hiệu lực.
     index('documents_effective_to_idx').on(table.tenantId, table.effectiveTo),

@@ -21,17 +21,28 @@ export const conversations = pgTable(
     userId: uuid('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    departmentHintId: uuid('department_hint_id').references(() => departments.id, {
-      onDelete: 'set null',
-    }),
+    departmentHintId: uuid('department_hint_id').references(
+      () => departments.id,
+      {
+        onDelete: 'set null',
+      },
+    ),
     status: conversationStatusEnum('status').notNull().default('active'),
-    startedAt: timestamp('started_at', { withTimezone: true }).notNull().defaultNow(),
+    startedAt: timestamp('started_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     /** Quá 30 phút im lặng thì tính là hội thoại mới, hint reset về rỗng. */
-    lastActivityAt: timestamp('last_activity_at', { withTimezone: true }).notNull().defaultNow(),
+    lastActivityAt: timestamp('last_activity_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     endedAt: timestamp('ended_at', { withTimezone: true }),
   },
   (table) => [
-    index('conversations_user_activity_idx').on(table.tenantId, table.userId, table.lastActivityAt),
+    index('conversations_user_activity_idx').on(
+      table.tenantId,
+      table.userId,
+      table.lastActivityAt,
+    ),
   ],
 );
 

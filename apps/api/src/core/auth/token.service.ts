@@ -63,9 +63,14 @@ export class TokenService {
       .setExpirationTime(`${ACCESS_TOKEN_TTL_SECONDS}s`)
       .sign(this.secret);
 
-  readonly verifyAccessToken = async (token: string): Promise<AccessTokenClaims | null> => {
+  readonly verifyAccessToken = async (
+    token: string,
+  ): Promise<AccessTokenClaims | null> => {
     try {
-      const { payload } = await jwtVerify<AccessTokenClaims>(token, this.secret);
+      const { payload } = await jwtVerify<AccessTokenClaims>(
+        token,
+        this.secret,
+      );
       return {
         userId: payload.userId,
         tenantId: payload.tenantId,
@@ -90,7 +95,12 @@ export class TokenService {
 
     await this.redis
       .multi()
-      .set(refreshKey(token), JSON.stringify(session), 'EX', REFRESH_TOKEN_TTL_SECONDS)
+      .set(
+        refreshKey(token),
+        JSON.stringify(session),
+        'EX',
+        REFRESH_TOKEN_TTL_SECONDS,
+      )
       .sadd(sessionsKey(userId), token)
       .expire(sessionsKey(userId), REFRESH_TOKEN_TTL_SECONDS)
       .exec();
@@ -98,7 +108,9 @@ export class TokenService {
     return token;
   };
 
-  readonly readRefreshToken = async (token: string): Promise<StoredSession | null> => {
+  readonly readRefreshToken = async (
+    token: string,
+  ): Promise<StoredSession | null> => {
     const raw = await this.redis.get(refreshKey(token));
     return raw === null ? null : (JSON.parse(raw) as StoredSession);
   };
@@ -113,7 +125,9 @@ export class TokenService {
    * Cả khối dùng `multi()` để 6 lệnh Redis hoặc cùng chạy hoặc cùng không — đứt
    * giữa chừng thì người dùng mất luôn phiên mà không hiểu vì sao.
    */
-  readonly rotateRefreshToken = async (token: string): Promise<RefreshOutcome> => {
+  readonly rotateRefreshToken = async (
+    token: string,
+  ): Promise<RefreshOutcome> => {
     const session = await this.readRefreshToken(token);
 
     if (session === null) {
@@ -132,7 +146,12 @@ export class TokenService {
       .del(refreshKey(token))
       .srem(sessionsKey(session.userId), token)
       .set(rotatedKey(token), session.userId, 'EX', REFRESH_TOKEN_TTL_SECONDS)
-      .set(refreshKey(nextToken), JSON.stringify(session), 'EX', REFRESH_TOKEN_TTL_SECONDS)
+      .set(
+        refreshKey(nextToken),
+        JSON.stringify(session),
+        'EX',
+        REFRESH_TOKEN_TTL_SECONDS,
+      )
       .sadd(sessionsKey(session.userId), nextToken)
       .expire(sessionsKey(session.userId), REFRESH_TOKEN_TTL_SECONDS)
       .exec();
@@ -144,7 +163,11 @@ export class TokenService {
     const session = await this.readRefreshToken(token);
     if (session === null) return;
 
-    await this.redis.multi().del(refreshKey(token)).srem(sessionsKey(session.userId), token).exec();
+    await this.redis
+      .multi()
+      .del(refreshKey(token))
+      .srem(sessionsKey(session.userId), token)
+      .exec();
   };
 
   /** Dùng khi nhân viên nghỉ việc hoặc admin khoá tài khoản. */

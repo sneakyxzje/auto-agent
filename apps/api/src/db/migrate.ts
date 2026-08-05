@@ -6,7 +6,10 @@ import { loadEnv } from '../config/env';
 // Chạy migration rồi thoát. Container api gọi file này trước khi start.
 const run = async (): Promise<void> => {
   const env = loadEnv();
-  const pool = new Pool({ connectionString: env.DATABASE_MIGRATION_URL, max: 1 });
+  const pool = new Pool({
+    connectionString: env.DATABASE_MIGRATION_URL,
+    max: 1,
+  });
 
   try {
     await migrate(drizzle(pool), {

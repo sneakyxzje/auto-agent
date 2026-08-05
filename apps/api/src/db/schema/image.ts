@@ -37,7 +37,9 @@ export const imageAssets = pgTable(
     extraction: jsonb('extraction').$type<ImageExtraction>(),
 
     uploadedBy: varchar('uploaded_by', { length: 255 }),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     /** Job nền quét cột này để xóa ảnh chat quá 90 ngày. */
     expiresAt: timestamp('expires_at', { withTimezone: true }),
   },

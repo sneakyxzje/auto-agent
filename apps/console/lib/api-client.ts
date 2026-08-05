@@ -19,7 +19,9 @@ export class ApiError extends Error {
 }
 
 const toFieldErrors = (body: ValidationErrorBody): Record<string, string> =>
-  Object.fromEntries((body.errors ?? []).map((issue) => [issue.field, issue.message]));
+  Object.fromEntries(
+    (body.errors ?? []).map((issue) => [issue.field, issue.message]),
+  );
 
 const parseBody = async (response: Response): Promise<unknown> => {
   const text = await response.text();
@@ -63,5 +65,11 @@ export const apiRequest = async <TResponse>(
   return body as TResponse;
 };
 
-export const postJson = <TResponse>(path: string, payload: unknown): Promise<TResponse> =>
-  apiRequest<TResponse>(path, { method: 'POST', body: JSON.stringify(payload) });
+export const postJson = <TResponse>(
+  path: string,
+  payload: unknown,
+): Promise<TResponse> =>
+  apiRequest<TResponse>(path, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });

@@ -1,4 +1,12 @@
-import { boolean, index, integer, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  index,
+  integer,
+  pgTable,
+  timestamp,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core';
 import { tenantIdColumn } from './tenant';
 import { users } from './user';
 
@@ -25,10 +33,16 @@ export const invitations = pgTable(
     revokedAt: timestamp('revoked_at', { withTimezone: true }),
     /** Cho phép mời thẳng một người làm admin, thay vì mời vào rồi nâng quyền sau. */
     grantsTenantAdmin: boolean('grants_tenant_admin').notNull().default(false),
-    createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdBy: uuid('created_by').references(() => users.id, {
+      onDelete: 'set null',
+    }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
-  (table) => [index('invitations_tenant_idx').on(table.tenantId, table.createdAt)],
+  (table) => [
+    index('invitations_tenant_idx').on(table.tenantId, table.createdAt),
+  ],
 );
 
 export type Invitation = typeof invitations.$inferSelect;

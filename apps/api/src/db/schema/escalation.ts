@@ -1,4 +1,11 @@
-import { index, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  index,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 import { conversations } from './conversation';
 import { departments } from './department';
 import { audienceEnum, candidateStatusEnum, ticketStatusEnum } from './enums';
@@ -27,8 +34,12 @@ export const escalationTickets = pgTable(
     dueAt: timestamp('due_at', { withTimezone: true }).notNull(),
     answerText: text('answer_text'),
     answeredAt: timestamp('answered_at', { withTimezone: true }),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     // Màn hình người phụ trách: phiếu đang mở của phòng mình.
@@ -71,8 +82,12 @@ export const knowledgeCandidates = pgTable(
     status: candidateStatusEnum('status').notNull().default('pending'),
     /** Hạn hiệu lực, chặn kiểu "tháng này đang giảm 10%" nhiễm kho vĩnh viễn. */
     ttlUntil: timestamp('ttl_until', { withTimezone: true }),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     // Cho cảnh báo hàng đợi duyệt bị dồn ứ.

@@ -27,8 +27,12 @@ export const departments = pgTable(
     description: text('description'),
     isActive: boolean('is_active').notNull().default(true),
     createdBy: varchar('created_by', { length: 255 }),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     // Slug chỉ duy nhất trong phạm vi một khách hàng — công ty nào cũng có quyền

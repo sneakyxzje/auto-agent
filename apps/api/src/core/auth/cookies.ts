@@ -1,5 +1,8 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { ACCESS_TOKEN_TTL_SECONDS, REFRESH_TOKEN_TTL_SECONDS } from './token.service';
+import {
+  ACCESS_TOKEN_TTL_SECONDS,
+  REFRESH_TOKEN_TTL_SECONDS,
+} from './token.service';
 
 export const ACCESS_TOKEN_COOKIE = 'at';
 export const REFRESH_TOKEN_COOKIE = 'rt';
@@ -29,15 +32,18 @@ type CookieReply = {
   clearCookie(name: string, options: Pick<CookieOptions, 'path'>): unknown;
 };
 
-const asCookieReply = (reply: FastifyReply): CookieReply => reply as unknown as CookieReply;
+const asCookieReply = (reply: FastifyReply): CookieReply =>
+  reply as unknown as CookieReply;
 
 const asCookieRequest = (
   request: FastifyRequest,
 ): { cookies: Record<string, string | undefined> } =>
   request as unknown as { cookies: Record<string, string | undefined> };
 
-export const readCookie = (request: FastifyRequest, name: string): string | undefined =>
-  asCookieRequest(request).cookies[name];
+export const readCookie = (
+  request: FastifyRequest,
+  name: string,
+): string | undefined => asCookieRequest(request).cookies[name];
 
 /**
  * `httpOnly` là điểm quan trọng nhất: JavaScript trên trang không đọc được cookie

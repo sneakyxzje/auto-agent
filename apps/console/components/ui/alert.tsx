@@ -7,7 +7,10 @@ type AlertProps = {
 };
 
 export const Alert = ({ tone, children }: AlertProps) => (
-  <p className={`${styles.alert} ${styles[tone]}`} role={tone === 'danger' ? 'alert' : 'status'}>
+  <p
+    className={`${styles.alert} ${styles[tone]}`}
+    role={tone === 'danger' ? 'alert' : 'status'}
+  >
     {children}
   </p>
 );

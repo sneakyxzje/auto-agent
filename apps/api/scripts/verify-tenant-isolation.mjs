@@ -29,11 +29,15 @@ for (const name of ['.env.local', '.env']) {
   if (existsSync(file)) process.loadEnvFile(file);
 }
 
-const owner = new pg.Pool({ connectionString: process.env.DATABASE_MIGRATION_URL, max: 2 });
+const owner = new pg.Pool({
+  connectionString: process.env.DATABASE_MIGRATION_URL,
+  max: 2,
+});
 const app = new pg.Pool({ connectionString: process.env.DATABASE_URL, max: 2 });
 
 const results = [];
-const check = (label, passed, detail = '') => results.push({ label, passed, detail });
+const check = (label, passed, detail = '') =>
+  results.push({ label, passed, detail });
 
 /** Mô phỏng đúng những gì withTenant() làm lúc chạy thật. */
 const asTenant = async (tenantId, run) => {
@@ -41,7 +45,9 @@ const asTenant = async (tenantId, run) => {
   try {
     await client.query('BEGIN');
     if (tenantId !== null) {
-      await client.query("SELECT set_config('app.tenant_id', $1, true)", [tenantId]);
+      await client.query("SELECT set_config('app.tenant_id', $1, true)", [
+        tenantId,
+      ]);
     }
     return await run(client);
   } finally {
@@ -66,8 +72,14 @@ const seed = async () => {
 };
 
 const cleanup = async (tenantA, tenantB) => {
-  await owner.query('DELETE FROM departments WHERE tenant_id IN ($1, $2)', [tenantA, tenantB]);
-  await owner.query('DELETE FROM tenants WHERE id IN ($1, $2)', [tenantA, tenantB]);
+  await owner.query('DELETE FROM departments WHERE tenant_id IN ($1, $2)', [
+    tenantA,
+    tenantB,
+  ]);
+  await owner.query('DELETE FROM tenants WHERE id IN ($1, $2)', [
+    tenantA,
+    tenantB,
+  ]);
 };
 
 const run = async () => {
@@ -93,7 +105,9 @@ const run = async () => {
     );
 
     const stolen = await asTenant(tenantA, (c) =>
-      c.query('SELECT * FROM departments WHERE tenant_id = $1', [tenantB]).then((r) => r.rows),
+      c
+        .query('SELECT * FROM departments WHERE tenant_id = $1', [tenantB])
+        .then((r) => r.rows),
     );
     check('Co tinh DOC du lieu khach khac: bi chan', stolen.length === 0);
 
@@ -110,7 +124,10 @@ const run = async () => {
     });
     check('Co tinh GHI sang khach khac: bi chan', writeBlocked);
 
-    const authPool = new pg.Pool({ connectionString: process.env.DATABASE_AUTH_URL, max: 1 });
+    const authPool = new pg.Pool({
+      connectionString: process.env.DATABASE_AUTH_URL,
+      max: 1,
+    });
     let authReadsUsers = true;
     let authBlockedElsewhere = false;
     try {
@@ -137,11 +154,15 @@ await owner.end();
 await app.end();
 
 for (const { label, passed, detail } of results) {
-  console.log(`${passed ? 'PASS' : 'FAIL'}  ${label}${detail ? `  (${detail})` : ''}`);
+  console.log(
+    `${passed ? 'PASS' : 'FAIL'}  ${label}${detail ? `  (${detail})` : ''}`,
+  );
 }
 
 const failed = results.filter((r) => !r.passed).length;
 console.log(
-  failed === 0 ? `\n${results.length}/${results.length} dat.` : `\n${failed} muc THAT BAI.`,
+  failed === 0
+    ? `\n${results.length}/${results.length} dat.`
+    : `\n${failed} muc THAT BAI.`,
 );
 process.exit(failed === 0 ? 0 : 1);

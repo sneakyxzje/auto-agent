@@ -23,7 +23,9 @@ export const mount = (options: MountOptions): void => {
   const { target, apiUrl } = options;
 
   if (!(target instanceof HTMLElement)) {
-    throw new TypeError('ChatbotWidget.mount: `target` phải là một HTMLElement');
+    throw new TypeError(
+      'ChatbotWidget.mount: `target` phải là một HTMLElement',
+    );
   }
 
   target.textContent = `Chatbot widget chưa được triển khai (API: ${apiUrl})`;
