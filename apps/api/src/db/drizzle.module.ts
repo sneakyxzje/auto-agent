@@ -6,27 +6,21 @@ import {
   type OnModuleDestroy,
   type OnModuleInit,
 } from '@nestjs/common';
-import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { ENV } from '../config/config.module';
 import type { Env } from '../config/env';
+import {
+  AUTH_DATABASE,
+  DATABASE,
+  type Database,
+  PG_POOL,
+} from './database.tokens';
 import * as schema from './schema';
 import { EMBEDDING_DIMENSIONS } from './schema/chunk';
+import { TenantDb } from './tenant-db.service';
 
-export const PG_POOL = Symbol('PG_POOL');
-export const DATABASE = Symbol('DATABASE');
-
-/**
- * Kết nối riêng cho luồng đăng ký / đăng nhập, chạy bằng role `chatbot_auth`.
- * Role này chỉ chạm được hai bảng `users` và `tenants`, vì lúc đó chưa biết người
- * dùng thuộc khách hàng nào nên chưa đặt được ngữ cảnh tenant.
- *
- * Đừng dùng nó cho việc gì khác — mọi truy vấn qua đây đều không bị RLS chặn.
- */
-export const AUTH_DATABASE = Symbol('AUTH_DATABASE');
-
-export type Database = NodePgDatabase<typeof schema>;
-export type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
+export * from './database.tokens';
 
 @Global()
 @Module({
@@ -50,8 +44,9 @@ export type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
         }),
       inject: [ENV],
     },
+    TenantDb,
   ],
-  exports: [DATABASE, AUTH_DATABASE, PG_POOL],
+  exports: [DATABASE, AUTH_DATABASE, PG_POOL, TenantDb],
 })
 export class DrizzleModule implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(DrizzleModule.name);

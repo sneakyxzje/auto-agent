@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import type { Database, Transaction } from './drizzle.module';
+import type { Database, Transaction } from './database.tokens';
 
 /**
  * Chạy một khối truy vấn trong ngữ cảnh của đúng một khách hàng.
