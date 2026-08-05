@@ -1,5 +1,7 @@
+'use client';
+
+import { Modal as HeroModal, useOverlayState } from '@heroui/react';
 import type { ReactNode } from 'react';
-import styles from './modal.module.css';
 
 type ModalProps = {
   title: string;
@@ -15,25 +17,33 @@ export const Modal = ({
   step,
   totalSteps,
   children,
-}: ModalProps) => (
-  <div className={styles.backdrop} role="dialog" aria-modal="true">
-    <div className={styles.panel}>
-      <div className={styles.steps}>
-        {Array.from({ length: totalSteps }, (_, index) => (
-          <span
-            key={`step-${index + 1}`}
-            className={
-              index < step ? `${styles.step} ${styles.stepActive}` : styles.step
-            }
-          />
-        ))}
-      </div>
+}: ModalProps) => {
+  const state = useOverlayState({ isOpen: true });
 
-      <h2 className={styles.title}>{title}</h2>
-      <p className={styles.subtitle}>{subtitle}</p>
-      <div className={styles.body}>{children}</div>
-    </div>
-  </div>
-);
+  return (
+    <HeroModal state={state}>
+      <HeroModal.Backdrop>
+        <HeroModal.Container size="sm" placement="center">
+          <HeroModal.Dialog>
+            <HeroModal.Header>
+              <div className="mb-3 flex gap-1.5">
+                {Array.from({ length: totalSteps }, (_, index) => (
+                  <span
+                    key={`step-${index + 1}`}
+                    className={`h-1 flex-1 rounded-full ${
+                      index < step ? 'bg-primary' : 'bg-default-200'
+                    }`}
+                  />
+                ))}
+              </div>
+              <HeroModal.Heading>{title}</HeroModal.Heading>
+              <p className="text-default-500 mt-1 text-sm">{subtitle}</p>
+            </HeroModal.Header>
 
-export const modalStyles = styles;
+            <HeroModal.Body>{children}</HeroModal.Body>
+          </HeroModal.Dialog>
+        </HeroModal.Container>
+      </HeroModal.Backdrop>
+    </HeroModal>
+  );
+};

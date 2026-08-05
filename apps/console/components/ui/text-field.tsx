@@ -1,5 +1,9 @@
-import { useId } from 'react';
-import styles from './text-field.module.css';
+import {
+  FieldError,
+  TextField as HeroTextField,
+  Input,
+  Label,
+} from '@heroui/react';
 
 type TextFieldProps = {
   label: string;
@@ -12,7 +16,6 @@ type TextFieldProps = {
   disabled?: boolean;
 };
 
-/** Gộp nhãn, ô nhập và thông báo lỗi làm một, để mọi form khỏi lặp lại ba phần này. */
 export const TextField = ({
   label,
   name,
@@ -22,36 +25,18 @@ export const TextField = ({
   error,
   autoComplete,
   disabled = false,
-}: TextFieldProps) => {
-  const id = useId();
-  const errorId = `${id}-error`;
-
-  return (
-    <div className={styles.field}>
-      <label className={styles.label} htmlFor={id}>
-        {label}
-      </label>
-      <input
-        id={id}
-        name={name}
-        type={type}
-        className={
-          error === undefined
-            ? styles.input
-            : `${styles.input} ${styles.invalid}`
-        }
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        autoComplete={autoComplete}
-        disabled={disabled}
-        aria-invalid={error !== undefined}
-        aria-describedby={error === undefined ? undefined : errorId}
-      />
-      {error !== undefined && (
-        <span className={styles.error} id={errorId}>
-          {error}
-        </span>
-      )}
-    </div>
-  );
-};
+}: TextFieldProps) => (
+  <HeroTextField
+    name={name}
+    type={type}
+    value={value}
+    onChange={onChange}
+    isDisabled={disabled}
+    isInvalid={error !== undefined}
+    fullWidth
+  >
+    <Label>{label}</Label>
+    <Input autoComplete={autoComplete} />
+    {error !== undefined && <FieldError>{error}</FieldError>}
+  </HeroTextField>
+);

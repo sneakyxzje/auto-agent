@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@heroui/react';
 import { useCurrentUser } from '@/features/auth/use-current-user';
 import { OnboardingModal } from '@/features/onboarding/onboarding-modal';
 
@@ -12,27 +12,25 @@ const PLANNED_SCREENS = [
   { path: '/dashboard', label: 'Chỉ số' },
 ] as const;
 
+const SHELL_CLASS = 'mx-auto max-w-3xl px-6 py-12';
+
 const HomePage = () => {
   const { user, loading, reload } = useCurrentUser();
 
   if (loading) {
     return (
-      <main
-        style={{ maxWidth: '48rem', margin: '0 auto', padding: '3rem 1.5rem' }}
-      >
-        <p>Đang tải...</p>
+      <main className={SHELL_CLASS}>
+        <p className="text-default-500">Đang tải...</p>
       </main>
     );
   }
 
   if (user === null) {
     return (
-      <main
-        style={{ maxWidth: '48rem', margin: '0 auto', padding: '3rem 1.5rem' }}
-      >
-        <h1>Chatbot nội bộ — Console</h1>
-        <p>
-          <Link href="/login">Đăng nhập</Link> ·{' '}
+      <main className={SHELL_CLASS}>
+        <h1 className="text-2xl font-semibold">Chatbot nội bộ</h1>
+        <p className="mt-4 flex gap-3">
+          <Link href="/login">Đăng nhập</Link>
           <Link href="/register">Đăng ký</Link>
         </p>
       </main>
@@ -40,20 +38,19 @@ const HomePage = () => {
   }
 
   return (
-    <main
-      style={{ maxWidth: '48rem', margin: '0 auto', padding: '3rem 1.5rem' }}
-    >
-      <h1>Chatbot nội bộ — Console</h1>
-      <p>
+    <main className={SHELL_CLASS}>
+      <h1 className="text-2xl font-semibold">Chatbot nội bộ</h1>
+      <p className="text-default-500 mt-1">
         {user.displayName}
         {user.tenant !== null && ` — ${user.tenant.name}`}
       </p>
 
-      <p>Các màn hình dưới đây chưa được triển khai.</p>
-      <ul>
+      <p className="mt-8 text-sm font-medium">Màn hình sắp có</p>
+      <ul className="text-default-500 mt-2 flex flex-col gap-1 text-sm">
         {PLANNED_SCREENS.map((screen) => (
           <li key={screen.path}>
-            <code>{screen.path}</code> — {screen.label}
+            <code className="text-foreground">{screen.path}</code> —{' '}
+            {screen.label}
           </li>
         ))}
       </ul>

@@ -1,5 +1,5 @@
+import { Alert as HeroAlert } from '@heroui/react';
 import type { ReactNode } from 'react';
-import styles from './alert.module.css';
 
 type AlertProps = {
   tone: 'danger' | 'success';
@@ -7,10 +7,10 @@ type AlertProps = {
 };
 
 export const Alert = ({ tone, children }: AlertProps) => (
-  <p
-    className={`${styles.alert} ${styles[tone]}`}
-    role={tone === 'danger' ? 'alert' : 'status'}
-  >
-    {children}
-  </p>
+  <HeroAlert status={tone}>
+    <HeroAlert.Indicator />
+    <HeroAlert.Content>
+      <HeroAlert.Description>{children}</HeroAlert.Description>
+    </HeroAlert.Content>
+  </HeroAlert>
 );

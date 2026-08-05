@@ -9,7 +9,7 @@ import {
 import { useState } from 'react';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Modal, modalStyles } from '@/components/ui/modal';
+import { Modal } from '@/components/ui/modal';
 import { TextField } from '@/components/ui/text-field';
 import { useAuthForm } from '@/features/auth/use-auth-form';
 import { createTenant, joinTenant } from './api';
@@ -20,6 +20,12 @@ type OnboardingModalProps = {
   displayName: string;
   onDone: () => Promise<void>;
 };
+
+const CHOICE_CLASS =
+  'hover:border-primary rounded-medium border-default-200 cursor-pointer border p-4 text-left transition-colors';
+const BACK_CLASS =
+  'text-default-500 hover:text-foreground cursor-pointer self-start bg-transparent text-sm';
+const FORM_CLASS = 'flex flex-col gap-4';
 
 export const OnboardingModal = ({
   displayName,
@@ -53,25 +59,25 @@ export const OnboardingModal = ({
         step={1}
         totalSteps={2}
       >
-        <div className={modalStyles.choices}>
+        <div className="flex flex-col gap-3">
           <button
             type="button"
-            className={modalStyles.choice}
+            className={CHOICE_CLASS}
             onClick={() => setStep('create')}
           >
-            <span className={modalStyles.choiceTitle}>Tôi tạo công ty mới</span>
-            <span className={modalStyles.choiceNote}>
+            <span className="block font-medium">Tôi tạo công ty mới</span>
+            <span className="text-default-500 mt-0.5 block text-sm">
               Bạn sẽ là quản trị viên và mời đồng nghiệp vào sau
             </span>
           </button>
 
           <button
             type="button"
-            className={modalStyles.choice}
+            className={CHOICE_CLASS}
             onClick={() => setStep('join')}
           >
-            <span className={modalStyles.choiceTitle}>Tôi có mã mời</span>
-            <span className={modalStyles.choiceNote}>
+            <span className="block font-medium">Tôi có mã mời</span>
+            <span className="text-default-500 mt-0.5 block text-sm">
               Đồng nghiệp đã tạo công ty và gửi mã cho bạn
             </span>
           </button>
@@ -89,7 +95,7 @@ export const OnboardingModal = ({
         totalSteps={2}
       >
         <form
-          className={modalStyles.body}
+          className={FORM_CLASS}
           onSubmit={createForm.handleSubmit}
           noValidate
         >
@@ -112,7 +118,7 @@ export const OnboardingModal = ({
 
           <button
             type="button"
-            className={modalStyles.back}
+            className={BACK_CLASS}
             onClick={() => setStep('choose')}
           >
             ← Quay lại
@@ -129,11 +135,7 @@ export const OnboardingModal = ({
       step={2}
       totalSteps={2}
     >
-      <form
-        className={modalStyles.body}
-        onSubmit={joinForm.handleSubmit}
-        noValidate
-      >
+      <form className={FORM_CLASS} onSubmit={joinForm.handleSubmit} noValidate>
         {joinForm.formError !== null && (
           <Alert tone="danger">{joinForm.formError}</Alert>
         )}
@@ -155,7 +157,7 @@ export const OnboardingModal = ({
 
         <button
           type="button"
-          className={modalStyles.back}
+          className={BACK_CLASS}
           onClick={() => setStep('choose')}
         >
           ← Quay lại
