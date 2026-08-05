@@ -4,9 +4,11 @@ packages:
 
 # pnpm chặn build script của dependency theo mặc định. Hai gói dưới đây cần chạy
 # postinstall để tải binary gốc, không bật thì tooling hỏng:
-#   esbuild — tsx (dev api) và vite (build widget) dựa vào
-#   sharp   — Next.js dùng để tối ưu ảnh
+#   esbuild    — tsx (dev api) và vite (build widget) dựa vào
+#   sharp      — Next.js dùng để tối ưu ảnh
+#   @swc/core  — vitest dùng để sinh decorator metadata cho NestJS
 allowBuilds:
+  '@swc/core': true
   esbuild: true
   sharp: true
 

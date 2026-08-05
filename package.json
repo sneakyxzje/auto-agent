@@ -13,7 +13,8 @@
     "lint": "biome check .",
     "format": "biome check --write .",
     "db:generate": "pnpm --filter @chatbot/api db:generate",
-    "db:migrate": "pnpm --filter @chatbot/api db:migrate"
+    "db:migrate": "pnpm --filter @chatbot/api db:migrate",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.0",
