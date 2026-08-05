@@ -7,6 +7,7 @@ import {
 import { ConfigModule } from './config/config.module';
 import { AuthModule } from './core/auth/auth.module';
 import { RequestContextMiddleware } from './core/context/request-context.middleware';
+import { TenantModule } from './core/tenant/tenant.module';
 import { DrizzleModule } from './db/drizzle.module';
 import { HealthModule } from './health/health.module';
 import { DepartmentModule } from './knowledge/department/department.module';
@@ -18,6 +19,7 @@ import { RedisModule } from './redis/redis.module';
     DrizzleModule,
     RedisModule,
     AuthModule,
+    TenantModule,
     DepartmentModule,
     HealthModule,
   ],
