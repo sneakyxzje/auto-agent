@@ -80,6 +80,20 @@ export const setAuthCookies = (
   });
 };
 
+export const setAccessTokenCookie = (
+  reply: FastifyReply,
+  isProduction: boolean,
+  accessToken: string,
+): void => {
+  asCookieReply(reply).setCookie(ACCESS_TOKEN_COOKIE, accessToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: ACCESS_TOKEN_TTL_SECONDS,
+  });
+};
+
 export const clearAuthCookies = (reply: FastifyReply): void => {
   const cookieReply = asCookieReply(reply);
   cookieReply.clearCookie(ACCESS_TOKEN_COOKIE, { path: '/' });
