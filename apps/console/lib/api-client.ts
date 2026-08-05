@@ -1,6 +1,13 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '/api';
 
-/** Lỗi 400 từ pipe zod ở server trả về danh sách trường sai. */
+const REFRESH_PATH = '/v1/auth/refresh';
+const PATHS_WITHOUT_RETRY = new Set([
+  '/v1/auth/login',
+  '/v1/auth/register',
+  '/v1/auth/logout',
+  REFRESH_PATH,
+]);
+
 type ValidationErrorBody = {
   message: string;
   errors?: { field: string; message: string }[];
@@ -10,7 +17,6 @@ export class ApiError extends Error {
   constructor(
     readonly status: number,
     message: string,
-    /** Ánh xạ tên trường → thông báo, để form tô đỏ đúng ô. */
     readonly fieldErrors: Record<string, string> = {},
   ) {
     super(message);
@@ -34,22 +40,36 @@ const parseBody = async (response: Response): Promise<unknown> => {
   }
 };
 
-/**
- * `credentials: 'include'` là điểm bắt buộc: token nằm trong cookie httpOnly, không
- * có dòng này thì trình duyệt không gửi kèm và mọi request đều bị coi là chưa đăng nhập.
- */
+const sendRequest = (path: string, init: RequestInit): Promise<Response> =>
+  fetch(`${API_BASE_URL}${path}`, {
+    ...init,
+    credentials: 'include',
+    headers: { 'content-type': 'application/json', ...init.headers },
+  });
+
+let pendingRefresh: Promise<boolean> | null = null;
+
+const refreshSession = (): Promise<boolean> => {
+  pendingRefresh ??= sendRequest(REFRESH_PATH, { method: 'POST' })
+    .then((response) => response.ok)
+    .catch(() => false)
+    .finally(() => {
+      pendingRefresh = null;
+    });
+
+  return pendingRefresh;
+};
+
 export const apiRequest = async <TResponse>(
   path: string,
   init: RequestInit = {},
 ): Promise<TResponse> => {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    credentials: 'include',
-    headers: {
-      'content-type': 'application/json',
-      ...init.headers,
-    },
-  });
+  let response = await sendRequest(path, init);
+
+  if (response.status === 401 && !PATHS_WITHOUT_RETRY.has(path)) {
+    const refreshed = await refreshSession();
+    if (refreshed) response = await sendRequest(path, init);
+  }
 
   const body = await parseBody(response);
 
