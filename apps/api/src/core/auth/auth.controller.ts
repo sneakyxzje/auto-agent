@@ -19,6 +19,7 @@ import {
 import type { FastifyReply } from 'fastify';
 import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
+import { RateLimiter } from '../../redis/rate-limiter.service';
 import { ZodBody } from '../http/zod-body.pipe';
 import { AuthService } from './auth.service';
 import {
@@ -31,10 +32,15 @@ import { CurrentUser } from './current-user';
 import { JwtGuard } from './jwt.guard';
 import type { AccessTokenClaims } from './token.service';
 
+const LOGIN_WINDOW_SECONDS = 15 * 60;
+const LOGIN_ATTEMPTS_PER_EMAIL = 8;
+const LOGIN_ATTEMPTS_PER_IP = 40;
+
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
+    private readonly rateLimiter: RateLimiter,
     @Inject(ENV) private readonly env: Env,
   ) {}
 
@@ -55,7 +61,22 @@ export class AuthController {
     @Body(new ZodBody(loginSchema)) input: LoginInput,
     @Res() reply: FastifyReply,
   ): Promise<void> {
+    const email = input.email.toLowerCase();
+
+    await this.rateLimiter.consume({
+      key: `login:ip:${reply.request.ip}`,
+      limit: LOGIN_ATTEMPTS_PER_IP,
+      windowSeconds: LOGIN_WINDOW_SECONDS,
+    });
+    await this.rateLimiter.consume({
+      key: `login:email:${email}`,
+      limit: LOGIN_ATTEMPTS_PER_EMAIL,
+      windowSeconds: LOGIN_WINDOW_SECONDS,
+    });
+
     const tokens = await this.authService.login(input);
+    await this.rateLimiter.reset(`login:email:${email}`);
+
     setAuthCookies(reply, this.isProduction, tokens);
     reply.send({ ok: true });
   }
