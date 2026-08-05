@@ -179,6 +179,51 @@ export class AuthService {
     };
   };
 
+  /**
+   * Đọc lại người dùng từ CSDL để đúc access token mới, không tái sử dụng thông tin
+   * trong token cũ.
+   *
+   * Đây là chỗ tự sửa cái bẫy "token mang dữ liệu lỗi thời": ai vừa tạo công ty
+   * xong, lần gia hạn kế tiếp sẽ nhận token có `tenantId` đúng. Đồng thời tài khoản
+   * bị khoá cũng mất quyền ngay ở lần gia hạn gần nhất chứ không đợi hết 30 ngày.
+   */
+  readonly refresh = async (refreshToken: string): Promise<AuthTokens> => {
+    const outcome = await this.tokenService.rotateRefreshToken(refreshToken);
+
+    if (outcome.status !== 'ok') {
+      throw new UnauthorizedException('Phiên đăng nhập không còn hiệu lực');
+    }
+
+    const found = await this.db
+      .select({
+        id: users.id,
+        tenantId: users.tenantId,
+        isTenantAdmin: users.isTenantAdmin,
+        isExternal: users.isExternal,
+        status: users.status,
+      })
+      .from(users)
+      .where(eq(users.id, outcome.userId))
+      .limit(1);
+
+    const user = found[0];
+
+    if (user === undefined || user.status !== 'active') {
+      await this.tokenService.revokeAllSessions(outcome.userId);
+      throw new UnauthorizedException('Tài khoản không còn hoạt động');
+    }
+
+    return {
+      accessToken: await this.tokenService.issueAccessToken({
+        userId: user.id,
+        tenantId: user.tenantId,
+        isTenantAdmin: user.isTenantAdmin,
+        isExternal: user.isExternal,
+      }),
+      refreshToken: outcome.refreshToken,
+    };
+  };
+
   readonly logout = async (refreshToken: string): Promise<void> =>
     this.tokenService.revokeRefreshToken(refreshToken);
 

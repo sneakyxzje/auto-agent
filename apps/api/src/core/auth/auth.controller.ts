@@ -73,6 +73,34 @@ export class AuthController {
   }
 
   /**
+   * Không đặt guard: gọi endpoint này đúng lúc access token vừa hết hạn mới là
+   * trường hợp thường gặp nhất. Bản thân refresh token đã là bằng chứng.
+   *
+   * Gia hạn thất bại thì xoá cookie luôn, để trình duyệt ngừng gửi một token đã
+   * chết ở mọi request sau đó.
+   */
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(@Res() reply: FastifyReply): Promise<void> {
+    const refreshToken = readCookie(reply.request, REFRESH_TOKEN_COOKIE);
+
+    if (refreshToken === undefined) {
+      clearAuthCookies(reply);
+      reply.code(HttpStatus.UNAUTHORIZED).send({ message: 'Chưa đăng nhập' });
+      return;
+    }
+
+    try {
+      const tokens = await this.authService.refresh(refreshToken);
+      setAuthCookies(reply, this.isProduction, tokens);
+      reply.send({ ok: true });
+    } catch {
+      clearAuthCookies(reply);
+      reply.code(HttpStatus.UNAUTHORIZED).send({ message: 'Phiên đăng nhập không còn hiệu lực' });
+    }
+  }
+
+  /**
    * Không đặt guard: access token có thể đã hết hạn mà người dùng vẫn cần đăng
    * xuất. Endpoint này chỉ xoá đúng refresh token được gửi kèm nên không có gì
    * để lạm dụng.
