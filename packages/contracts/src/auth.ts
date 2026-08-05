@@ -23,6 +23,23 @@ export const joinTenantSchema = z.object({
 });
 export type JoinTenantInput = z.infer<typeof joinTenantSchema>;
 
+export const createInvitationSchema = z.object({
+  maxUses: z.coerce.number().int().min(1).max(200).default(1),
+  expiresInDays: z.coerce.number().int().min(1).max(90).default(7),
+  grantsTenantAdmin: z.boolean().default(false),
+});
+export type CreateInvitationInput = z.infer<typeof createInvitationSchema>;
+
+export const invitationSchema = z.object({
+  id: z.uuid(),
+  code: z.string(),
+  maxUses: z.number(),
+  usedCount: z.number(),
+  expiresAt: z.string(),
+  grantsTenantAdmin: z.boolean(),
+});
+export type Invitation = z.infer<typeof invitationSchema>;
+
 export const loginSchema = z.object({
   email: z.email().max(320),
   password: z.string().min(1).max(128),
