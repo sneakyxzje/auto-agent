@@ -21,7 +21,12 @@ import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { ZodBody } from '../http/zod-body.pipe';
 import { AuthService } from './auth.service';
-import { clearAuthCookies, REFRESH_TOKEN_COOKIE, readCookie, setAuthCookies } from './cookies';
+import {
+  clearAuthCookies,
+  REFRESH_TOKEN_COOKIE,
+  readCookie,
+  setAuthCookies,
+} from './cookies';
 import { CurrentUser } from './current-user';
 import { JwtGuard } from './jwt.guard';
 import type { AccessTokenClaims } from './token.service';
@@ -33,12 +38,6 @@ export class AuthController {
     @Inject(ENV) private readonly env: Env,
   ) {}
 
-  /**
-   * Token đi vào cookie httpOnly chứ không nằm trong phần thân phản hồi. Trả token
-   * ra body thì JavaScript đọc được, và chỉ cần một lỗ XSS là mất sạch.
-   *
-   * Dùng `@Res()` nên phải tự gọi `reply.send()`, NestJS không tự gửi nữa.
-   */
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(
@@ -61,24 +60,14 @@ export class AuthController {
     reply.send({ ok: true });
   }
 
-  /**
-   * Đọc lại từ CSDL chứ không lấy thẳng thông tin trong token: token là bản chụp
-   * lúc đăng nhập, còn màn hình cần dữ liệu hiện tại. Vừa tạo công ty xong mà đọc
-   * theo token thì vẫn thấy `tenant: null` suốt 15 phút.
-   */
   @Get('me')
   @UseGuards(JwtGuard)
-  async me(@CurrentUser() user: AccessTokenClaims): Promise<CurrentUserPayload> {
+  async me(
+    @CurrentUser() user: AccessTokenClaims,
+  ): Promise<CurrentUserPayload> {
     return this.authService.getCurrentUser(user.userId);
   }
 
-  /**
-   * Không đặt guard: gọi endpoint này đúng lúc access token vừa hết hạn mới là
-   * trường hợp thường gặp nhất. Bản thân refresh token đã là bằng chứng.
-   *
-   * Gia hạn thất bại thì xoá cookie luôn, để trình duyệt ngừng gửi một token đã
-   * chết ở mọi request sau đó.
-   */
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(@Res() reply: FastifyReply): Promise<void> {
@@ -96,15 +85,12 @@ export class AuthController {
       reply.send({ ok: true });
     } catch {
       clearAuthCookies(reply);
-      reply.code(HttpStatus.UNAUTHORIZED).send({ message: 'Phiên đăng nhập không còn hiệu lực' });
+      reply
+        .code(HttpStatus.UNAUTHORIZED)
+        .send({ message: 'Phiên đăng nhập không còn hiệu lực' });
     }
   }
 
-  /**
-   * Không đặt guard: access token có thể đã hết hạn mà người dùng vẫn cần đăng
-   * xuất. Endpoint này chỉ xoá đúng refresh token được gửi kèm nên không có gì
-   * để lạm dụng.
-   */
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Res() reply: FastifyReply): Promise<void> {

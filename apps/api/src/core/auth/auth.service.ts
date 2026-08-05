@@ -1,4 +1,8 @@
-import type { CurrentUser, LoginInput, RegisterInput } from '@chatbot/contracts';
+import type {
+  CurrentUser,
+  LoginInput,
+  RegisterInput,
+} from '@chatbot/contracts';
 import {
   ConflictException,
   Inject,
@@ -29,7 +33,11 @@ const isUniqueViolation = (error: unknown, constraint: string): boolean => {
       constraint?: unknown;
       cause?: unknown;
     };
-    if (candidate.code === UNIQUE_VIOLATION && candidate.constraint === constraint) return true;
+    if (
+      candidate.code === UNIQUE_VIOLATION &&
+      candidate.constraint === constraint
+    )
+      return true;
     current = candidate.cause;
   }
 
@@ -53,10 +61,6 @@ export class AuthService {
     private readonly tokenService: TokenService,
   ) {}
 
-  /**
-   * Chỉ tạo tài khoản, `tenantId` để rỗng. Việc chọn tạo công ty hay nhập mã mời
-   * nằm ở bước sau. Đăng ký xong cấp token luôn, không bắt gõ lại mật khẩu.
-   */
   readonly register = async (input: RegisterInput): Promise<AuthTokens> => {
     const passwordHash = await hashPassword(input.password);
 
@@ -92,15 +96,6 @@ export class AuthService {
     }
   };
 
-  /**
-   * Email không tồn tại và mật khẩu sai đều trả về đúng một thông báo. Nếu phân
-   * biệt hai trường hợp, kẻ tấn công thử hàng loạt email là dò ra được email nào
-   * có tài khoản trong hệ thống.
-   *
-   * Cùng lý do, khi không tìm thấy email vẫn phải chạy `verifyPassword` với một
-   * chuỗi băm giả: không làm vậy thì email sai trả lời trong 1ms còn email đúng
-   * mất 40ms, và chênh lệch đó cũng đủ để dò.
-   */
   readonly login = async (input: LoginInput): Promise<AuthTokens> => {
     const found = await this.db
       .select({
@@ -116,13 +111,19 @@ export class AuthService {
       .limit(1);
 
     const user = found[0];
-    const matched = await verifyPassword(input.password, user?.passwordHash ?? DUMMY_HASH);
+    const matched = await verifyPassword(
+      input.password,
+      user?.passwordHash ?? DUMMY_HASH,
+    );
 
     if (user === undefined || !matched || user.status !== 'active') {
       throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
     }
 
-    await this.db.update(users).set({ lastLoginAt: new Date() }).where(eq(users.id, user.id));
+    await this.db
+      .update(users)
+      .set({ lastLoginAt: new Date() })
+      .where(eq(users.id, user.id));
 
     return this.issueTokens({
       userId: user.id,
@@ -132,13 +133,6 @@ export class AuthService {
     });
   };
 
-  /**
-   * `leftJoin` chứ không phải `innerJoin`: người vừa đăng ký chưa có công ty, dùng
-   * `innerJoin` thì truy vấn trả về rỗng và họ thành "không tồn tại".
-   *
-   * `tenant: null` chính là tín hiệu để giao diện hiện màn hình chọn tạo công ty
-   * hay nhập mã mời.
-   */
   readonly getCurrentUser = async (userId: string): Promise<CurrentUser> => {
     const found = await this.db
       .select({
@@ -158,10 +152,6 @@ export class AuthService {
 
     const row = found[0];
 
-    /**
-     * Token hợp lệ nhưng người dùng không còn trong CSDL — tài khoản vừa bị xoá mà
-     * token cũ chưa hết hạn. Trả 404 để client biết đường xoá phiên.
-     */
     if (row === undefined) {
       throw new NotFoundException('Tài khoản không còn tồn tại');
     }
@@ -173,20 +163,14 @@ export class AuthService {
       isExternal: row.isExternal,
       isTenantAdmin: row.isTenantAdmin,
       tenant:
-        row.tenantId === null || row.tenantName === null || row.tenantSlug === null
+        row.tenantId === null ||
+        row.tenantName === null ||
+        row.tenantSlug === null
           ? null
           : { id: row.tenantId, name: row.tenantName, slug: row.tenantSlug },
     };
   };
 
-  /**
-   * Đọc lại người dùng từ CSDL để đúc access token mới, không tái sử dụng thông tin
-   * trong token cũ.
-   *
-   * Đây là chỗ tự sửa cái bẫy "token mang dữ liệu lỗi thời": ai vừa tạo công ty
-   * xong, lần gia hạn kế tiếp sẽ nhận token có `tenantId` đúng. Đồng thời tài khoản
-   * bị khoá cũng mất quyền ngay ở lần gia hạn gần nhất chứ không đợi hết 30 ngày.
-   */
   readonly refresh = async (refreshToken: string): Promise<AuthTokens> => {
     const outcome = await this.tokenService.rotateRefreshToken(refreshToken);
 
@@ -227,15 +211,13 @@ export class AuthService {
   readonly logout = async (refreshToken: string): Promise<void> =>
     this.tokenService.revokeRefreshToken(refreshToken);
 
-  private readonly issueTokens = async (claims: AccessTokenClaims): Promise<AuthTokens> => ({
+  private readonly issueTokens = async (
+    claims: AccessTokenClaims,
+  ): Promise<AuthTokens> => ({
     accessToken: await this.tokenService.issueAccessToken(claims),
     refreshToken: await this.tokenService.issueRefreshToken(claims.userId),
   });
 }
 
-/**
- * Chuỗi băm hợp lệ của một mật khẩu không ai biết. Chỉ dùng để `verifyPassword`
- * vẫn tốn đúng chừng đó thời gian khi email không tồn tại.
- */
 const DUMMY_HASH =
   '$argon2id$v=19$m=19456,t=2,p=1$c29tZXNhbHR2YWx1ZXg$J8pQMDIbnZ1PXNc5wRB1r5UlF9vD5ZgVYqPqXqTPXqI';
