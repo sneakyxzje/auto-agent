@@ -31,7 +31,10 @@ services:
     volumes:
       - redisdata:/data
     ports:
-      - '6379:6379'
+      # Chỉ đổi cổng phía host, giữa các container vẫn là 6379. Đặt khác 6379 nếu
+      # máy đã có Redis riêng (Memurai, WSL, dự án Docker khác) — Windows cho phép
+      # nhiều tiến trình cùng nghe một cổng và kết nối rơi vào bên nào là hên xui.
+      - '${REDIS_HOST_PORT:-6379}:6379'
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 5s
