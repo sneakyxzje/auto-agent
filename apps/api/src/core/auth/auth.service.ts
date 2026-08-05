@@ -1,4 +1,4 @@
-import type {
+﻿import type {
   CurrentUser,
   LoginInput,
   RegisterInput,
@@ -75,7 +75,7 @@ export class AuthService {
         .returning({
           id: users.id,
           tenantId: users.tenantId,
-          isTenantAdmin: users.isTenantAdmin,
+          role: users.role,
           isExternal: users.isExternal,
         });
 
@@ -85,7 +85,7 @@ export class AuthService {
       return this.issueTokens({
         userId: user.id,
         tenantId: user.tenantId,
-        isTenantAdmin: user.isTenantAdmin,
+        role: user.role,
         isExternal: user.isExternal,
       });
     } catch (error) {
@@ -102,7 +102,7 @@ export class AuthService {
         id: users.id,
         tenantId: users.tenantId,
         passwordHash: users.passwordHash,
-        isTenantAdmin: users.isTenantAdmin,
+        role: users.role,
         isExternal: users.isExternal,
         status: users.status,
       })
@@ -128,7 +128,7 @@ export class AuthService {
     return this.issueTokens({
       userId: user.id,
       tenantId: user.tenantId,
-      isTenantAdmin: user.isTenantAdmin,
+      role: user.role,
       isExternal: user.isExternal,
     });
   };
@@ -140,7 +140,7 @@ export class AuthService {
         email: users.email,
         displayName: users.displayName,
         isExternal: users.isExternal,
-        isTenantAdmin: users.isTenantAdmin,
+        role: users.role,
         tenantId: tenants.id,
         tenantName: tenants.name,
         tenantSlug: tenants.slug,
@@ -161,7 +161,7 @@ export class AuthService {
       email: row.email,
       displayName: row.displayName,
       isExternal: row.isExternal,
-      isTenantAdmin: row.isTenantAdmin,
+      role: row.role,
       tenant:
         row.tenantId === null ||
         row.tenantName === null ||
@@ -182,7 +182,7 @@ export class AuthService {
       .select({
         id: users.id,
         tenantId: users.tenantId,
-        isTenantAdmin: users.isTenantAdmin,
+        role: users.role,
         isExternal: users.isExternal,
         status: users.status,
       })
@@ -201,7 +201,7 @@ export class AuthService {
       accessToken: await this.tokenService.issueAccessToken({
         userId: user.id,
         tenantId: user.tenantId,
-        isTenantAdmin: user.isTenantAdmin,
+        role: user.role,
         isExternal: user.isExternal,
       }),
       refreshToken: outcome.refreshToken,

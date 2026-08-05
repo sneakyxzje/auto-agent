@@ -61,7 +61,7 @@ export class JwtGuard implements CanActivate {
     fillRequestContext({
       userId: claims.userId,
       tenantId: claims.tenantId,
-      isTenantAdmin: claims.isTenantAdmin,
+      role: claims.role,
       isExternal: claims.isExternal,
     });
 

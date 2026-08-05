@@ -5,6 +5,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { loadEnv } from './config/env';
 
+// Đặt TRƯỚC khi Nest dựng module: API và worker dùng chung AppModule, chỉ tiến
+// trình này mới được bật consumer BullMQ. Thiếu cờ thì mỗi bản API cũng tranh job.
+process.env.RUN_WORKER = '1';
+
 /**
  * Tiến trình chạy job nền: ingest tài liệu, trích xuất ảnh, lọc PII, gửi webhook,
  * quét SLA, dọn ảnh hết hạn. Dùng chung image và AppModule với `main.ts`.
@@ -36,7 +40,7 @@ const bootstrap = async (): Promise<void> => {
   const app = await NestFactory.createApplicationContext(AppModule, {
     abortOnError: false,
   });
-  logger.log(`Worker sẵn sàng (${env.NODE_ENV}) — chưa đăng ký job nào`);
+  logger.log(`Worker sẵn sàng (${env.NODE_ENV})`);
 
   const signal = await waitForShutdownSignal();
   logger.log(`Nhận ${signal}, đang đóng kết nối...`);

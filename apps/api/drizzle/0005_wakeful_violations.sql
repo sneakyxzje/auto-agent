@@ -1,0 +1,1 @@
+ALTER TABLE "knowledge_candidates" ADD COLUMN "suggested_title" varchar(512);

@@ -17,8 +17,8 @@ export class InvitationService {
     const context = readRequestContext();
     const tenantId = context?.tenantId ?? null;
 
-    if (tenantId === null || context?.isTenantAdmin !== true) {
-      throw new ForbiddenException('Chỉ admin của công ty mới tạo được mã mời');
+    if (tenantId === null) {
+      throw new ForbiddenException('Tài khoản chưa thuộc công ty nào');
     }
 
     return this.tenantDb.run(async (tx) => {
@@ -28,9 +28,9 @@ export class InvitationService {
           tenantId,
           code: generateInviteCode(),
           maxUses: input.maxUses,
-          grantsTenantAdmin: input.grantsTenantAdmin,
+          grantsRole: input.grantsRole,
           expiresAt: new Date(Date.now() + input.expiresInDays * DAY_IN_MS),
-          createdBy: context.userId,
+          createdBy: context?.userId ?? null,
         })
         .returning({
           id: invitations.id,
@@ -38,7 +38,7 @@ export class InvitationService {
           maxUses: invitations.maxUses,
           usedCount: invitations.usedCount,
           expiresAt: invitations.expiresAt,
-          grantsTenantAdmin: invitations.grantsTenantAdmin,
+          grantsRole: invitations.grantsRole,
         });
 
       const invitation = created[0];

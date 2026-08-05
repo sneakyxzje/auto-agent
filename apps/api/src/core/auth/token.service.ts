@@ -1,4 +1,5 @@
 import { randomBytes } from 'node:crypto';
+import type { UserRole } from '@chatbot/contracts';
 import { Inject, Injectable } from '@nestjs/common';
 import type Redis from 'ioredis';
 import { jwtVerify, SignJWT } from 'jose';
@@ -18,7 +19,7 @@ export type AccessTokenClaims = {
   userId: string;
   /** Rỗng khi người dùng chưa tạo hay chưa vào công ty nào. */
   tenantId: string | null;
-  isTenantAdmin: boolean;
+  role: UserRole;
   isExternal: boolean;
 };
 
@@ -74,7 +75,8 @@ export class TokenService {
       return {
         userId: payload.userId,
         tenantId: payload.tenantId,
-        isTenantAdmin: payload.isTenantAdmin,
+        // Token cũ phát trước khi có vai trò thì coi như quyền thấp nhất.
+        role: payload.role ?? 'user',
         isExternal: payload.isExternal,
       };
     } catch {

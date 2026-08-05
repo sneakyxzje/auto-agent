@@ -1,9 +1,10 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
+import type { UserRole } from '@chatbot/contracts';
 
 export type RequestContext = {
   userId: string | null;
   tenantId: string | null;
-  isTenantAdmin: boolean;
+  role: UserRole;
   isExternal: boolean;
 };
 
@@ -12,7 +13,7 @@ const storage = new AsyncLocalStorage<RequestContext>();
 const emptyContext = (): RequestContext => ({
   userId: null,
   tenantId: null,
-  isTenantAdmin: false,
+  role: 'user',
   isExternal: true,
 });
 

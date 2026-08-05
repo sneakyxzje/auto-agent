@@ -5,6 +5,7 @@ import {
   text,
   timestamp,
   uuid,
+  varchar,
 } from 'drizzle-orm/pg-core';
 import { conversations } from './conversation';
 import { departments } from './department';
@@ -72,6 +73,8 @@ export const knowledgeCandidates = pgTable(
     rawAnswer: text('raw_answer').notNull(),
     /** Bản model viết lại thành văn phong tài liệu, bỏ ngữ cảnh cá nhân. */
     normalizedAnswer: text('normalized_answer'),
+    /** Tiêu đề model đề xuất, Owner sửa được trước khi duyệt. */
+    suggestedTitle: varchar('suggested_title', { length: 512 }),
     /** Đoạn tài liệu tương tự, đặt cạnh bên để Owner đối chiếu trước khi duyệt. */
     similarChunks: jsonb('similar_chunks').$type<SimilarChunkRef[]>(),
     /** Mặc định internal cho tới khi Owner chủ động mở ra public. */

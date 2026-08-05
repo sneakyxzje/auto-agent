@@ -1,5 +1,4 @@
 import {
-  boolean,
   index,
   integer,
   pgTable,
@@ -7,6 +6,7 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
+import { userRoleEnum } from './enums';
 import { tenantIdColumn } from './tenant';
 import { users } from './user';
 
@@ -31,8 +31,8 @@ export const invitations = pgTable(
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
     /** Admin thu hồi mã trước hạn. Khác với hết lượt hoặc hết hạn. */
     revokedAt: timestamp('revoked_at', { withTimezone: true }),
-    /** Cho phép mời thẳng một người làm admin, thay vì mời vào rồi nâng quyền sau. */
-    grantsTenantAdmin: boolean('grants_tenant_admin').notNull().default(false),
+    /** Mời thẳng vào đúng vai trò, thay vì mời vào rồi nâng quyền sau. */
+    grantsRole: userRoleEnum('grants_role').notNull().default('user'),
     createdBy: uuid('created_by').references(() => users.id, {
       onDelete: 'set null',
     }),

@@ -9,7 +9,7 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 import { departments } from './department';
-import { membershipRoleEnum, userStatusEnum } from './enums';
+import { membershipRoleEnum, userRoleEnum, userStatusEnum } from './enums';
 import { tenantIdColumn, tenants } from './tenant';
 
 /**
@@ -32,8 +32,8 @@ export const users = pgTable(
     passwordHash: text('password_hash').notNull(),
     displayName: varchar('display_name', { length: 255 }).notNull(),
     isExternal: boolean('is_external').notNull().default(true),
-    /** Admin của chính công ty này, không phải admin của cả dịch vụ. */
-    isTenantAdmin: boolean('is_tenant_admin').notNull().default(false),
+    /** Vai trò trong công ty này, không phải quyền trên cả dịch vụ. */
+    role: userRoleEnum('role').notNull().default('user'),
     status: userStatusEnum('status').notNull().default('active'),
     lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })

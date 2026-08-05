@@ -1,3 +1,4 @@
+export * from './chat-settings';
 export * from './chunk';
 export * from './conversation';
 export * from './department';

@@ -1,4 +1,4 @@
-import type { CreateTenantInput, JoinTenantInput } from '@chatbot/contracts';
+﻿import type { CreateTenantInput, JoinTenantInput } from '@chatbot/contracts';
 import {
   BadRequestException,
   Inject,
@@ -43,13 +43,13 @@ export class TenantService {
         .set({
           tenantId: tenant.id,
           isExternal: false,
-          isTenantAdmin: true,
+          role: 'admin' as const,
           updatedAt: new Date(),
         })
         .where(eq(users.id, userId))
         .returning({
           id: users.id,
-          isTenantAdmin: users.isTenantAdmin,
+          role: users.role,
           isExternal: users.isExternal,
         });
 
@@ -62,7 +62,7 @@ export class TenantService {
         claims: {
           userId: user.id,
           tenantId: tenant.id,
-          isTenantAdmin: user.isTenantAdmin,
+          role: user.role,
           isExternal: user.isExternal,
         },
       };
@@ -89,7 +89,7 @@ export class TenantService {
         )
         .returning({
           tenantId: invitations.tenantId,
-          grantsTenantAdmin: invitations.grantsTenantAdmin,
+          grantsRole: invitations.grantsRole,
         });
 
       const invitation = claimed[0];
@@ -114,13 +114,13 @@ export class TenantService {
         .set({
           tenantId: tenant.id,
           isExternal: false,
-          isTenantAdmin: invitation.grantsTenantAdmin,
+          role: invitation.grantsRole,
           updatedAt: new Date(),
         })
         .where(eq(users.id, userId))
         .returning({
           id: users.id,
-          isTenantAdmin: users.isTenantAdmin,
+          role: users.role,
           isExternal: users.isExternal,
         });
 
@@ -133,7 +133,7 @@ export class TenantService {
         claims: {
           userId: user.id,
           tenantId: tenant.id,
-          isTenantAdmin: user.isTenantAdmin,
+          role: user.role,
           isExternal: user.isExternal,
         },
       };

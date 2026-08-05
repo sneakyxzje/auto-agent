@@ -12,6 +12,7 @@ import {
   audienceEnum,
   documentSourceTypeEnum,
   documentStatusEnum,
+  ingestStatusEnum,
 } from './enums';
 import { tenantIdColumn } from './tenant';
 
@@ -42,6 +43,17 @@ export const documents = pgTable(
     fileSha256: varchar('file_sha256', { length: 64 }),
     /** Đường dẫn trong S3/MinIO. */
     fileRef: text('file_ref'),
+    /** Tên file người dùng tải lên, chỉ để hiển thị và đặt tên lúc tải về. */
+    fileName: varchar('file_name', { length: 512 }),
+    fileSizeBytes: integer('file_size_bytes'),
+    fileMimeType: varchar('file_mime_type', { length: 128 }),
+
+    ingestStatus: ingestStatusEnum('ingest_status')
+      .notNull()
+      .default('pending'),
+    /** Lý do hỏng, hiện thẳng cho Editor thay vì bắt đi đọc log. */
+    ingestError: text('ingest_error'),
+    chunkCount: integer('chunk_count').notNull().default(0),
     uploadedBy: varchar('uploaded_by', { length: 255 }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
