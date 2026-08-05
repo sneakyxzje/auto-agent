@@ -2,14 +2,19 @@ packages:
   - apps/*
   - packages/*
 
-# pnpm chặn build script của dependency theo mặc định. Hai gói dưới đây cần chạy
+# pnpm chặn build script của dependency theo mặc định. Ba gói dưới đây cần chạy
 # postinstall để tải binary gốc, không bật thì tooling hỏng:
 #   esbuild    — tsx (dev api) và vite (build widget) dựa vào
 #   sharp      — Next.js dùng để tối ưu ảnh
 #   @swc/core  — vitest dùng để sinh decorator metadata cho NestJS
+#
+# msgpackr-extract chỉ là bản tăng tốc gốc của msgpackr (BullMQ dùng để đóng gói
+# job). Không build thì msgpackr tự chạy bản JS thuần, đổi lại khỏi cần toolchain
+# biên dịch C++ trên máy dev Windows.
 allowBuilds:
   '@swc/core': true
   esbuild: true
+  msgpackr-extract: false
   sharp: true
 
 # @nestjs/platform-fastify và @fastify/cookie chốt hai bản fastify khác nhau. Hai
