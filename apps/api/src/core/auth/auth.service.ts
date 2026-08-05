@@ -1,7 +1,14 @@
-import type { LoginInput, RegisterInput } from '@chatbot/contracts';
-import { ConflictException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import type { CurrentUser, LoginInput, RegisterInput } from '@chatbot/contracts';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { AUTH_DATABASE, type Database } from '../../db/drizzle.module';
+import { tenants } from '../../db/schema/tenant';
 import { users } from '../../db/schema/user';
 import { hashPassword, verifyPassword } from './password';
 import { type AccessTokenClaims, TokenService } from './token.service';
@@ -123,6 +130,53 @@ export class AuthService {
       isTenantAdmin: user.isTenantAdmin,
       isExternal: user.isExternal,
     });
+  };
+
+  /**
+   * `leftJoin` chứ không phải `innerJoin`: người vừa đăng ký chưa có công ty, dùng
+   * `innerJoin` thì truy vấn trả về rỗng và họ thành "không tồn tại".
+   *
+   * `tenant: null` chính là tín hiệu để giao diện hiện màn hình chọn tạo công ty
+   * hay nhập mã mời.
+   */
+  readonly getCurrentUser = async (userId: string): Promise<CurrentUser> => {
+    const found = await this.db
+      .select({
+        id: users.id,
+        email: users.email,
+        displayName: users.displayName,
+        isExternal: users.isExternal,
+        isTenantAdmin: users.isTenantAdmin,
+        tenantId: tenants.id,
+        tenantName: tenants.name,
+        tenantSlug: tenants.slug,
+      })
+      .from(users)
+      .leftJoin(tenants, eq(tenants.id, users.tenantId))
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    const row = found[0];
+
+    /**
+     * Token hợp lệ nhưng người dùng không còn trong CSDL — tài khoản vừa bị xoá mà
+     * token cũ chưa hết hạn. Trả 404 để client biết đường xoá phiên.
+     */
+    if (row === undefined) {
+      throw new NotFoundException('Tài khoản không còn tồn tại');
+    }
+
+    return {
+      id: row.id,
+      email: row.email,
+      displayName: row.displayName,
+      isExternal: row.isExternal,
+      isTenantAdmin: row.isTenantAdmin,
+      tenant:
+        row.tenantId === null || row.tenantName === null || row.tenantSlug === null
+          ? null
+          : { id: row.tenantId, name: row.tenantName, slug: row.tenantSlug },
+    };
   };
 
   readonly logout = async (refreshToken: string): Promise<void> =>

@@ -1,16 +1,30 @@
+import type { CurrentUser as CurrentUserPayload } from '@chatbot/contracts';
 import {
   type LoginInput,
   loginSchema,
   type RegisterInput,
   registerSchema,
 } from '@chatbot/contracts';
-import { Body, Controller, HttpCode, HttpStatus, Inject, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import type { FastifyReply } from 'fastify';
 import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { ZodBody } from '../http/zod-body.pipe';
 import { AuthService } from './auth.service';
 import { clearAuthCookies, REFRESH_TOKEN_COOKIE, readCookie, setAuthCookies } from './cookies';
+import { CurrentUser } from './current-user';
+import { JwtGuard } from './jwt.guard';
+import type { AccessTokenClaims } from './token.service';
 
 @Controller('auth')
 export class AuthController {
@@ -47,6 +61,22 @@ export class AuthController {
     reply.send({ ok: true });
   }
 
+  /**
+   * Đọc lại từ CSDL chứ không lấy thẳng thông tin trong token: token là bản chụp
+   * lúc đăng nhập, còn màn hình cần dữ liệu hiện tại. Vừa tạo công ty xong mà đọc
+   * theo token thì vẫn thấy `tenant: null` suốt 15 phút.
+   */
+  @Get('me')
+  @UseGuards(JwtGuard)
+  async me(@CurrentUser() user: AccessTokenClaims): Promise<CurrentUserPayload> {
+    return this.authService.getCurrentUser(user.userId);
+  }
+
+  /**
+   * Không đặt guard: access token có thể đã hết hạn mà người dùng vẫn cần đăng
+   * xuất. Endpoint này chỉ xoá đúng refresh token được gửi kèm nên không có gì
+   * để lạm dụng.
+   */
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Res() reply: FastifyReply): Promise<void> {
