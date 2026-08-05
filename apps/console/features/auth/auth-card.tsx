@@ -24,7 +24,7 @@ export const AuthCard = ({
       <Card.Content>{children}</Card.Content>
 
       <Card.Footer className="justify-center">
-        <p className="text-default-500 text-sm">{footer}</p>
+        <p className="text-muted text-sm">{footer}</p>
       </Card.Footer>
     </Card>
   </div>

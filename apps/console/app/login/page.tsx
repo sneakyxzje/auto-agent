@@ -28,7 +28,7 @@ const LoginPage = () => {
     <RedirectWhenSignedIn>
       <AuthCard
         title="Đăng nhập"
-        subtitle="Chatbot nội bộ"
+        subtitle="Auto Agent"
         footer={
           <>
             Chưa có tài khoản? <Link href="/register">Đăng ký</Link>

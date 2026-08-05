@@ -1,0 +1,88 @@
+'use client';
+
+import { hasRole } from '@chatbot/contracts';
+import Link from 'next/link';
+import type { ComponentType } from 'react';
+import {
+  BellIcon,
+  type IconProps,
+  MoreIcon,
+  PanelLeftIcon,
+  PlusIcon,
+  ShareIcon,
+  SparkIcon,
+} from './icons';
+import { useWorkspace } from './workspace-context';
+
+type TopbarProps = {
+  sidebarOpen: boolean;
+  onExpand: () => void;
+};
+
+const ICON_BUTTON_CLASS =
+  'bg-surface border-border text-muted hover:text-foreground flex size-9 cursor-pointer items-center justify-center rounded-lg border';
+
+const IconAction = ({
+  label,
+  icon: Icon,
+}: {
+  label: string;
+  icon: ComponentType<IconProps>;
+}) => (
+  <button
+    type="button"
+    aria-label={label}
+    title="Sắp có"
+    className={ICON_BUTTON_CLASS}
+  >
+    <Icon className="size-4" />
+  </button>
+);
+
+export const Topbar = ({ sidebarOpen, onExpand }: TopbarProps) => {
+  const { user } = useWorkspace();
+  const canInvite = hasRole(user.role, 'admin');
+
+  return (
+    <header className="flex h-16 shrink-0 items-center justify-between gap-4 px-5">
+      <div className="flex items-center gap-2">
+        {!sidebarOpen && (
+          <span className="hidden md:block">
+            <button
+              type="button"
+              onClick={onExpand}
+              aria-label="Mở thanh bên"
+              className={ICON_BUTTON_CLASS}
+            >
+              <PanelLeftIcon className="size-4" />
+            </button>
+          </span>
+        )}
+
+        <Link
+          href="/"
+          className="bg-surface border-border hover:bg-surface-hover flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm"
+        >
+          <PlusIcon className="text-muted size-4" />
+          Cuộc hỏi mới
+        </Link>
+      </div>
+
+      <div className="flex items-center gap-2">
+        {canInvite && (
+          <Link
+            href="/members"
+            className="bg-foreground text-background flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium"
+          >
+            <SparkIcon className="size-4" />
+            Mời đồng nghiệp
+          </Link>
+        )}
+
+        <IconAction label="Thông báo" icon={BellIcon} />
+        <IconAction label="Chia sẻ" icon={ShareIcon} />
+        <IconAction label="Tuỳ chọn khác" icon={MoreIcon} />
+      </div>
+    </header>
+  );
+};

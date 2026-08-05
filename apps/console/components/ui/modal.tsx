@@ -31,13 +31,13 @@ export const Modal = ({
                   <span
                     key={`step-${index + 1}`}
                     className={`h-1 flex-1 rounded-full ${
-                      index < step ? 'bg-primary' : 'bg-default-200'
+                      index < step ? 'bg-accent' : 'bg-border'
                     }`}
                   />
                 ))}
               </div>
               <HeroModal.Heading>{title}</HeroModal.Heading>
-              <p className="text-default-500 mt-1 text-sm">{subtitle}</p>
+              <p className="text-muted mt-1 text-sm">{subtitle}</p>
             </HeroModal.Header>
 
             <HeroModal.Body>{children}</HeroModal.Body>

@@ -22,9 +22,9 @@ type OnboardingModalProps = {
 };
 
 const CHOICE_CLASS =
-  'hover:border-primary rounded-medium border-default-200 cursor-pointer border p-4 text-left transition-colors';
+  'hover:border-accent border-border cursor-pointer rounded-xl border p-4 text-left transition-colors';
 const BACK_CLASS =
-  'text-default-500 hover:text-foreground cursor-pointer self-start bg-transparent text-sm';
+  'text-muted hover:text-foreground cursor-pointer self-start bg-transparent text-sm';
 const FORM_CLASS = 'flex flex-col gap-4';
 
 export const OnboardingModal = ({
@@ -66,7 +66,7 @@ export const OnboardingModal = ({
             onClick={() => setStep('create')}
           >
             <span className="block font-medium">Tôi tạo công ty mới</span>
-            <span className="text-default-500 mt-0.5 block text-sm">
+            <span className="text-muted mt-0.5 block text-sm">
               Bạn sẽ là quản trị viên và mời đồng nghiệp vào sau
             </span>
           </button>
@@ -77,7 +77,7 @@ export const OnboardingModal = ({
             onClick={() => setStep('join')}
           >
             <span className="block font-medium">Tôi có mã mời</span>
-            <span className="text-default-500 mt-0.5 block text-sm">
+            <span className="text-muted mt-0.5 block text-sm">
               Đồng nghiệp đã tạo công ty và gửi mã cho bạn
             </span>
           </button>

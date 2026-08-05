@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '/api';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '/api';
 
 const REFRESH_PATH = '/v1/auth/refresh';
 const PATHS_WITHOUT_RETRY = new Set([
@@ -40,16 +40,31 @@ const parseBody = async (response: Response): Promise<unknown> => {
   }
 };
 
-const sendRequest = (path: string, init: RequestInit): Promise<Response> =>
-  fetch(`${API_BASE_URL}${path}`, {
+/**
+ * Chỉ khai `content-type: application/json` khi thật sự có body JSON.
+ *
+ * FormData tự đặt content-type kèm boundary, ghi đè là hỏng phần tách file. Còn
+ * request không body (GET, DELETE) mà khai JSON thì Fastify từ chối thẳng với
+ * "Body cannot be empty when content-type is set to 'application/json'".
+ */
+const sendRequest = (path: string, init: RequestInit): Promise<Response> => {
+  const hasJsonBody =
+    init.body !== undefined &&
+    init.body !== null &&
+    !(init.body instanceof FormData);
+
+  return fetch(`${API_BASE_URL}${path}`, {
     ...init,
     credentials: 'include',
-    headers: { 'content-type': 'application/json', ...init.headers },
+    headers: hasJsonBody
+      ? { 'content-type': 'application/json', ...init.headers }
+      : { ...init.headers },
   });
+};
 
 let pendingRefresh: Promise<boolean> | null = null;
 
-const refreshSession = (): Promise<boolean> => {
+export const refreshSession = (): Promise<boolean> => {
   pendingRefresh ??= sendRequest(REFRESH_PATH, { method: 'POST' })
     .then((response) => response.ok)
     .catch(() => false)
@@ -93,3 +108,21 @@ export const postJson = <TResponse>(
     method: 'POST',
     body: JSON.stringify(payload),
   });
+
+export const patchJson = <TResponse>(
+  path: string,
+  payload: unknown,
+): Promise<TResponse> =>
+  apiRequest<TResponse>(path, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+
+export const deleteRequest = <TResponse>(path: string): Promise<TResponse> =>
+  apiRequest<TResponse>(path, { method: 'DELETE' });
+
+export const postForm = <TResponse>(
+  path: string,
+  form: FormData,
+): Promise<TResponse> =>
+  apiRequest<TResponse>(path, { method: 'POST', body: form });
