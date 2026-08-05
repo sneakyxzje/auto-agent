@@ -4,3 +4,5 @@ export * from './auth.js';
 export * from './chat.js';
 export * from './common.js';
 export * from './department.js';
+export * from './document.js';
+export * from './escalation.js';

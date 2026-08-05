@@ -10,10 +10,10 @@ export const departmentSchema = z.object({
 });
 export type Department = z.infer<typeof departmentSchema>;
 
-export const createDepartmentSchema = departmentSchema.pick({
-  name: true,
-  slug: true,
-  description: true,
+export const createDepartmentSchema = z.object({
+  name: z.string().min(1).max(255),
+  slug: departmentSlugSchema,
+  description: z.string().max(2000).nullish().default(null),
 });
 export type CreateDepartment = z.infer<typeof createDepartmentSchema>;
 

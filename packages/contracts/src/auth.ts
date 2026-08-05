@@ -23,10 +23,26 @@ export const joinTenantSchema = z.object({
 });
 export type JoinTenantInput = z.infer<typeof joinTenantSchema>;
 
+/**
+ * Vai trò trong một công ty. Mỗi mức bao trùm mức dưới:
+ *
+ *   user     hỏi đáp, xem tài liệu và phòng ban
+ *   manager  + tải tài liệu, trả lời phiếu chuyển, duyệt tri thức vào kho
+ *   admin    + tạo phòng ban, phát mã mời, đổi vai trò người khác
+ */
+export const userRoleSchema = z.enum(['user', 'manager', 'admin']);
+export type UserRole = z.infer<typeof userRoleSchema>;
+
+const RANK: Record<UserRole, number> = { user: 0, manager: 1, admin: 2 };
+
+/** Dùng chung cho cả guard ở server lẫn phần ẩn/hiện ở giao diện. */
+export const hasRole = (actual: UserRole, required: UserRole): boolean =>
+  RANK[actual] >= RANK[required];
+
 export const createInvitationSchema = z.object({
   maxUses: z.coerce.number().int().min(1).max(200).default(1),
   expiresInDays: z.coerce.number().int().min(1).max(90).default(7),
-  grantsTenantAdmin: z.boolean().default(false),
+  grantsRole: userRoleSchema.default('user'),
 });
 export type CreateInvitationInput = z.infer<typeof createInvitationSchema>;
 
@@ -36,9 +52,25 @@ export const invitationSchema = z.object({
   maxUses: z.number(),
   usedCount: z.number(),
   expiresAt: z.string(),
-  grantsTenantAdmin: z.boolean(),
+  grantsRole: userRoleSchema,
 });
 export type Invitation = z.infer<typeof invitationSchema>;
+
+export const memberSchema = z.object({
+  id: z.uuid(),
+  email: z.email(),
+  displayName: z.string(),
+  role: userRoleSchema,
+  status: z.enum(['active', 'suspended']),
+  lastLoginAt: z.string().nullable(),
+  createdAt: z.string(),
+});
+export type Member = z.infer<typeof memberSchema>;
+
+export const updateMemberRoleSchema = z.object({
+  role: userRoleSchema,
+});
+export type UpdateMemberRoleInput = z.infer<typeof updateMemberRoleSchema>;
 
 export const loginSchema = z.object({
   email: z.email().max(320),
@@ -57,7 +89,7 @@ export const currentUserSchema = z.object({
   email: z.email(),
   displayName: z.string(),
   isExternal: z.boolean(),
-  isTenantAdmin: z.boolean(),
+  role: userRoleSchema,
   tenant: z
     .object({
       id: z.uuid(),
