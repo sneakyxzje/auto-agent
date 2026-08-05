@@ -1,7 +1,9 @@
 'use client';
 
-import { Link } from '@heroui/react';
-import { useCurrentUser } from '@/features/auth/use-current-user';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { logout } from '@/features/auth/api';
+import { RequireAuth } from '@/features/auth/require-auth';
 import { OnboardingModal } from '@/features/onboarding/onboarding-modal';
 
 const PLANNED_SCREENS = [
@@ -12,53 +14,48 @@ const PLANNED_SCREENS = [
   { path: '/dashboard', label: 'Chỉ số' },
 ] as const;
 
-const SHELL_CLASS = 'mx-auto max-w-3xl px-6 py-12';
-
 const HomePage = () => {
-  const { user, loading, reload } = useCurrentUser();
+  const router = useRouter();
 
-  if (loading) {
-    return (
-      <main className={SHELL_CLASS}>
-        <p className="text-default-500">Đang tải...</p>
-      </main>
-    );
-  }
-
-  if (user === null) {
-    return (
-      <main className={SHELL_CLASS}>
-        <h1 className="text-2xl font-semibold">Chatbot nội bộ</h1>
-        <p className="mt-4 flex gap-3">
-          <Link href="/login">Đăng nhập</Link>
-          <Link href="/register">Đăng ký</Link>
-        </p>
-      </main>
-    );
-  }
+  const signOut = async () => {
+    await logout();
+    router.replace('/login');
+  };
 
   return (
-    <main className={SHELL_CLASS}>
-      <h1 className="text-2xl font-semibold">Chatbot nội bộ</h1>
-      <p className="text-default-500 mt-1">
-        {user.displayName}
-        {user.tenant !== null && ` — ${user.tenant.name}`}
-      </p>
+    <RequireAuth>
+      {({ user, reload }) => (
+        <main className="mx-auto max-w-3xl px-6 py-12">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold">Chatbot nội bộ</h1>
+              <p className="text-default-500 mt-1">
+                {user.displayName}
+                {user.tenant !== null && ` — ${user.tenant.name}`}
+              </p>
+            </div>
 
-      <p className="mt-8 text-sm font-medium">Màn hình sắp có</p>
-      <ul className="text-default-500 mt-2 flex flex-col gap-1 text-sm">
-        {PLANNED_SCREENS.map((screen) => (
-          <li key={screen.path}>
-            <code className="text-foreground">{screen.path}</code> —{' '}
-            {screen.label}
-          </li>
-        ))}
-      </ul>
+            <Button variant="ghost" onClick={signOut}>
+              Đăng xuất
+            </Button>
+          </div>
 
-      {user.tenant === null && (
-        <OnboardingModal displayName={user.displayName} onDone={reload} />
+          <p className="mt-10 text-sm font-medium">Màn hình sắp có</p>
+          <ul className="text-default-500 mt-2 flex flex-col gap-1 text-sm">
+            {PLANNED_SCREENS.map((screen) => (
+              <li key={screen.path}>
+                <code className="text-foreground">{screen.path}</code> —{' '}
+                {screen.label}
+              </li>
+            ))}
+          </ul>
+
+          {user.tenant === null && (
+            <OnboardingModal displayName={user.displayName} onDone={reload} />
+          )}
+        </main>
       )}
-    </main>
+    </RequireAuth>
   );
 };
 
