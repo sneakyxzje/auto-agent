@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import type { FastifyRequest } from 'fastify';
+import { fillRequestContext } from '../context/request-context';
 import { ACCESS_TOKEN_COOKIE, readCookie } from './cookies';
 import { attachCurrentUser } from './current-user';
 import { TokenService } from './token.service';
@@ -57,6 +58,13 @@ export class JwtGuard implements CanActivate {
     }
 
     attachCurrentUser(request, claims);
+    fillRequestContext({
+      userId: claims.userId,
+      tenantId: claims.tenantId,
+      isTenantAdmin: claims.isTenantAdmin,
+      isExternal: claims.isExternal,
+    });
+
     return true;
   };
 }
