@@ -21,6 +21,11 @@
       "allowComments": true
     }
   },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
   "javascript": {
     "parser": {
       "unsafeParameterDecoratorsEnabled": true
