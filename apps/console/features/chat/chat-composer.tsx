@@ -11,11 +11,9 @@ import {
 } from 'react';
 import type { DepartmentSummary } from '@/features/departments/api';
 import {
-  GridIcon,
   ImageIcon,
   MicIcon,
   PlusIcon,
-  SearchIcon,
   SendIcon,
   XIcon,
 } from '@/features/workspace/icons';
@@ -25,8 +23,6 @@ const ACCEPT_IMAGES = IMAGE_EXTENSIONS.map((extension) => `.${extension}`).join(
   ',',
 );
 
-const CHIP_CLASS =
-  'bg-surface border-border text-muted hover:text-foreground flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm';
 const ROUND_BUTTON_CLASS =
   'border-border text-muted hover:text-foreground flex size-10 cursor-pointer items-center justify-center rounded-xl border bg-transparent';
 
@@ -183,23 +179,6 @@ export const ChatComposer = ({
       )}
 
       <div className="border-border bg-surface overflow-hidden rounded-3xl border shadow-xs">
-        {!compact && (
-          <div className="border-border bg-background/60 flex flex-wrap items-center gap-2 border-b px-4 py-3">
-            <button type="button" className={CHIP_CLASS} title="Sắp có">
-              <SearchIcon className="size-4" />
-              Tra tài liệu
-            </button>
-            <button type="button" className={CHIP_CLASS} onClick={openPicker}>
-              <ImageIcon className="size-4" />
-              Gửi kèm ảnh
-            </button>
-            <button type="button" className={CHIP_CLASS} title="Sắp có">
-              <GridIcon className="size-4" />
-              Thêm
-            </button>
-          </div>
-        )}
-
         {images.length > 0 && (
           <div className="flex flex-wrap gap-2 px-4 pt-4">
             {images.map((image) => (
