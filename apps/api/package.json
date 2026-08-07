@@ -14,6 +14,7 @@
     "seed:admin": "tsx scripts/seed-admin.ts",
     "eval:generate": "tsx scripts/generate-eval-set.ts",
     "eval:diagnose": "tsx scripts/diagnose-rag.ts",
+    "eval:trace": "tsx scripts/trace-question.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
