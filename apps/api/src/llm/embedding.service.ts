@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import type OpenAI from 'openai';
 import { ENV } from '../config/config.module';
 import type { Env } from '../config/env';
@@ -17,8 +17,13 @@ const supportsDimensions = (model: string): boolean =>
 /** Gửi cả mẻ trong một request; quá lớn thì nhà cung cấp từ chối. */
 const BATCH_SIZE = 64;
 
+/** Trên ngưỡng này thì nhà cung cấp embedding đang là nút thắt, phải nói ra. */
+const SLOW_BATCH_MS = 10_000;
+
 @Injectable()
 export class EmbeddingService {
+  private readonly logger = new Logger(EmbeddingService.name);
+
   constructor(
     @Inject(EMBEDDING_CLIENT) private readonly client: OpenAI,
     @Inject(ENV) private readonly env: Env,
@@ -29,6 +34,7 @@ export class EmbeddingService {
 
     for (let start = 0; start < texts.length; start += BATCH_SIZE) {
       const batch = texts.slice(start, start + BATCH_SIZE);
+      const startedAt = Date.now();
 
       const response = await this.client.embeddings.create({
         model: this.env.EMBEDDING_MODEL,
@@ -37,6 +43,13 @@ export class EmbeddingService {
           ? { dimensions: EMBEDDING_DIMENSIONS }
           : {}),
       });
+
+      const elapsed = Date.now() - startedAt;
+      if (elapsed >= SLOW_BATCH_MS) {
+        this.logger.warn(
+          `Embedding ${batch.length} đoạn mất ${Math.round(elapsed / 1000)}s tại ${this.env.EMBEDDING_BASE_URL} — nhà cung cấp đang là nút thắt`,
+        );
+      }
 
       for (const item of response.data) {
         if (item.embedding.length !== EMBEDDING_DIMENSIONS) {

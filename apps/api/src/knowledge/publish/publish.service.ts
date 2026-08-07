@@ -103,8 +103,14 @@ export class PublishService {
     });
 
     const pieces = chunkText(content);
+
+    this.logger.log(`Đang tạo embedding cho ${pieces.length} đoạn...`);
+    const embedStartedAt = Date.now();
     const vectors = await this.embedding.embed(
       pieces.map((piece) => piece.content),
+    );
+    this.logger.log(
+      `Xong embedding ${pieces.length} đoạn sau ${Math.round((Date.now() - embedStartedAt) / 1000)}s`,
     );
 
     await this.tenantDb.runAs(tenantId, async (tx) => {
