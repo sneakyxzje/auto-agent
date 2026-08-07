@@ -11,6 +11,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "verify:isolation": "node scripts/verify-tenant-isolation.mjs",
+    "eval:generate": "tsx scripts/generate-eval-set.ts",
+    "eval:diagnose": "tsx scripts/diagnose-rag.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -33,6 +35,7 @@
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "sharp": "^0.35.3",
     "unpdf": "^1.8.0",
     "zod": "^4.1.5"
   },
