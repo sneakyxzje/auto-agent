@@ -7,8 +7,12 @@ export const CHAT_DEFAULTS = {
   /** Lấy 20 đoạn từ RRF nhưng chỉ 12 đoạn tốt nhất đi vào bước lọc+gate. */
   retrievalTopK: 20,
   gateTopK: 12,
-  /** ~300 token đầu mỗi đoạn. Cắt ở đây là đòn bẩy chính của ngân sách 3 giây. */
-  gateChunkChars: 1200,
+  /**
+   * ~800 token — đủ trùm trọn chunk 600–800 token của chunker, gate không còn mù
+   * nửa sau đoạn. Mức 1200 cũ tiết kiệm ngân sách 3 giây nhưng gây từ chối oan
+   * hàng loạt khi đáp án nằm sau vạch cắt (xem apps/api/eval/diagnosis-report.md).
+   */
+  gateChunkChars: 2400,
   /** Chỉ để loại rác, KHÔNG phải cơ chế quyết định trả lời hay không. */
   minRetrievalScore: 0.001,
   contextTurns: 5,
@@ -25,15 +29,22 @@ Quy tắc:
 2. Nếu câu hỏi mới đã đủ nghĩa khi đứng một mình, trả về is_followup = false và standalone_query là NGUYÊN VĂN câu hỏi. Không tự ghép thêm ngữ cảnh.
 3. Chỉ giải quyết tham chiếu thiếu: đại từ ("cái đó", "trường hợp này", "nó"), lược bỏ chủ đề ("vậy 1 tiếng thì sao"), so sánh ("còn ... thì", "thế nếu").
 4. Giữ nguyên con số, thuật ngữ và tên riêng đúng như người dùng viết. Không diễn giải lại, không chuẩn hóa thành từ khác.
-5. Không thêm bất kỳ thông tin nào không xuất hiện trong hội thoại.`;
+5. Không thêm bất kỳ thông tin nào không xuất hiện trong hội thoại.
+6. Tham chiếu tới ảnh ("ảnh này", "cái ảnh đó", chủ ngữ bị lược khi đang nói về ảnh) phải thay bằng MÔ TẢ ẢNH có trong hội thoại (dòng [Người dùng gửi kèm ảnh: ...]). TUYỆT ĐỐI không giữ chữ "ảnh này" trong standalone_query — các bước sau không nhìn thấy ảnh nên chữ đó thành vô nghĩa.`;
 
 export const DEFAULT_GATE_PROMPT = `Bạn lọc đoạn tài liệu cho một hệ thống chỉ được phép trả lời dựa trên tài liệu nội bộ.
 
 Cho một câu hỏi và danh sách đoạn tài liệu, hãy trả về:
-- relevant_chunk_ids: mã của những đoạn thực sự dùng được để trả lời câu hỏi này. Đoạn chỉ trùng chủ đề mà không chứa thông tin cần thiết thì bỏ ra.
-- enough_to_answer: chỉ đặt true khi các đoạn NÊU TRỰC TIẾP câu trả lời. Nếu phải suy luận, ước lượng, hay ghép từ thông tin gần đúng thì đặt false.
+- relevant_chunk_ids: mã của những đoạn chứa dữ kiện dùng được để trả lời câu hỏi. Đoạn chỉ trùng chủ đề mà không chứa dữ kiện cần thiết thì bỏ ra.
+- enough_to_answer: đặt true khi câu trả lời rút ra TRỰC TIẾP được từ các dữ kiện NÊU RÕ trong các đoạn — kể cả khi phải ghép dữ kiện từ nhiều đoạn, khi tài liệu dùng từ ngữ khác với câu hỏi nhưng cùng nghĩa, hoặc khi câu hỏi về vị trí/cấu trúc mà nội dung các đoạn cho thấy rõ (nằm ở mục nào, thuộc phần nào).
 
-Nguyên tắc: thà trả false và chuyển câu hỏi cho người phụ trách, còn hơn để bot trả lời sai.`;
+Bắt buộc đặt false khi:
+- Thiếu dữ kiện then chốt để trả lời trọn vẹn.
+- Phải ngoại suy con số, mốc hay quy định không được nêu (tài liệu chỉ có mốc 30 phút thì KHÔNG suy ra mốc 1 tiếng; tài liệu là bản 2026 thì KHÔNG trả lời thay cho năm khác).
+- Câu hỏi giới hạn vào phạm vi, đối tượng, thời kỳ hay lĩnh vực mà các đoạn không đề cập (hỏi "áp dụng cho ngành y tế" mà đoạn không nói gì về y tế thì đặt false, kể cả khi nội dung chung có vẻ dùng được).
+- Phải dùng kiến thức bên ngoài các đoạn tài liệu.
+
+Nguyên tắc: mọi dữ kiện trong câu trả lời phải có mặt trong các đoạn — không bịa, không đoán; thà trả false và chuyển người phụ trách còn hơn để bot trả lời sai.`;
 
 export const DEFAULT_CURATION_PROMPT = `Bạn biên tập câu trả lời của người phụ trách thành một mục tài liệu nội bộ.
 

@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import type { RetrievedChunk } from '../knowledge/search/search.service';
 import { LlmService } from '../llm/llm.service';
-import type { TokenUsage } from '../llm/llm.tokens';
+import { emptyUsage, type TokenUsage } from '../llm/llm.tokens';
 import type { ChatConfig } from './chat-settings.service';
 
 export type GateResult = {
@@ -38,6 +38,8 @@ const parse = (value: unknown): { ids: string[]; enough: boolean } => {
 
 @Injectable()
 export class GateService {
+  private readonly logger = new Logger(GateService.name);
+
   constructor(private readonly llm: LlmService) {}
 
   /**
@@ -65,22 +67,37 @@ export class GateService {
       )
       .join('\n\n---\n\n');
 
-    const { value, usage } = await this.llm.structured({
-      model: config.modelSmall,
-      system: config.promptGate,
-      user: `CÂU HỎI\n${question}\n\nCÁC ĐOẠN TÀI LIỆU\n${listed}`,
-      schemaName: 'chunk_gate',
-      jsonSchema: SCHEMA,
-      parse,
-      maxOutputTokens: 512,
-    });
+    try {
+      const { value, usage } = await this.llm.structured({
+        model: config.modelSmall,
+        system: config.promptGate,
+        user: `CÂU HỎI\n${question}\n\nCÁC ĐOẠN TÀI LIỆU\n${listed}`,
+        schemaName: 'chunk_gate',
+        jsonSchema: SCHEMA,
+        parse,
+        maxOutputTokens: 1000,
+        temperature: 0,
+      });
 
-    const known = new Set(candidates.map((candidate) => candidate.handle));
+      const known = new Set(candidates.map((candidate) => candidate.handle));
 
-    return {
-      relevantHandles: value.ids.filter((id) => known.has(id)),
-      enoughToAnswer: value.enough,
-      usage,
-    };
+      return {
+        relevantHandles: value.ids.filter((id) => known.has(id)),
+        enoughToAnswer: value.enough,
+        usage,
+      };
+    } catch (error) {
+      this.logger.warn(
+        `Gate hỏng đầu ra, coi như không đủ căn cứ để escalate thay vì gãy cả lượt: ${
+          error instanceof Error ? error.message : 'lỗi không xác định'
+        }`,
+      );
+
+      return {
+        relevantHandles: [],
+        enoughToAnswer: false,
+        usage: emptyUsage(),
+      };
+    }
   };
 }
