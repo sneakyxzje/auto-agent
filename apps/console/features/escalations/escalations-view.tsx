@@ -1,16 +1,76 @@
 'use client';
 
-import type { EscalationTicket } from '@chatbot/contracts';
+import type {
+  ConversationTranscript,
+  EscalationTicket,
+} from '@chatbot/contracts';
 import { Spinner } from '@heroui/react';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/ui/dialog';
 import { SelectField } from '@/components/ui/select-field';
+import { getTranscript } from '@/features/chat/api';
 import { useDepartments } from '@/features/departments/use-departments';
 import { PageView } from '@/features/workspace/page-view';
-import { ApiError } from '@/lib/api-client';
+import { API_BASE_URL, ApiError } from '@/lib/api-client';
 import { answerTicket, listTickets, reassignTicket } from './api';
+
+const HISTORY_TURNS = 8;
+
+const ConversationPreview = ({
+  transcript,
+}: {
+  transcript: ConversationTranscript | null;
+}) => {
+  if (transcript === null || transcript.messages.length === 0) return null;
+
+  const recent = transcript.messages.slice(-HISTORY_TURNS);
+
+  return (
+    <div className="bg-background border-border max-h-72 overflow-y-auto rounded-xl border p-4">
+      <p className="text-muted text-xs">
+        Hội thoại của người hỏi ({HISTORY_TURNS} lượt gần nhất)
+      </p>
+
+      <div className="mt-2 flex flex-col gap-3">
+        {recent.map((message) => (
+          <div key={message.id}>
+            <p className="text-muted text-[11px]">
+              {message.role === 'user' ? 'Người hỏi' : 'Bot'}
+            </p>
+
+            {message.attachments.length > 0 && (
+              <div className="mt-1 flex flex-wrap gap-2">
+                {message.attachments.map(({ imageId }) => (
+                  <a
+                    key={imageId}
+                    href={`${API_BASE_URL}/v1/images/${imageId}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    title="Mở ảnh gốc"
+                  >
+                    <img
+                      src={`${API_BASE_URL}/v1/images/${imageId}`}
+                      alt="Ảnh người hỏi gửi kèm"
+                      className="border-border max-h-28 rounded-lg border object-cover"
+                    />
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {message.content.length > 0 && (
+              <p className="mt-0.5 line-clamp-3 text-sm whitespace-pre-wrap">
+                {message.content}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const STATUS_OPTIONS = [
   { value: 'open', label: 'Đang chờ trả lời' },
@@ -47,6 +107,7 @@ export const EscalationsView = () => {
   const [status, setStatus] = useState('open');
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState<EscalationTicket | null>(null);
+  const [history, setHistory] = useState<ConversationTranscript | null>(null);
   const [answer, setAnswer] = useState('');
   const [moveTo, setMoveTo] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +134,11 @@ export const EscalationsView = () => {
     setAnswer(ticket.answerText ?? '');
     setMoveTo(ticket.departmentId);
     setError(null);
+
+    setHistory(null);
+    void getTranscript(ticket.conversationId)
+      .then(setHistory)
+      .catch(() => setHistory(null));
   };
 
   const submit = async (): Promise<void> => {
@@ -102,8 +168,8 @@ export const EscalationsView = () => {
 
   return (
     <PageView
-      title="Phiếu chuyển"
-      subtitle="Câu hỏi bot không đủ căn cứ để trả lời. Trả lời xong sẽ tự sinh một ứng viên tri thức chờ duyệt."
+      title="Ticket"
+      subtitle="Nếu câu hỏi Agent không có căn cứ để trả lời thì câu hỏi sẽ được đẩy vào tại đây."
     >
       <div className="max-w-xs">
         <SelectField
@@ -177,6 +243,8 @@ export const EscalationsView = () => {
               <p className="text-muted text-xs">Câu hỏi</p>
               <p className="mt-1 text-base">{active.question}</p>
             </div>
+
+            <ConversationPreview transcript={history} />
 
             <div className="flex flex-col gap-1.5">
               <label htmlFor="answer" className="text-sm font-medium">
