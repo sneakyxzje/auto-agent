@@ -107,7 +107,7 @@ export class ChatController {
   ): Promise<ConversationTranscript> {
     return this.conversations.transcript(
       id,
-      user.userId,
+      user,
     ) as Promise<ConversationTranscript>;
   }
 
@@ -117,11 +117,11 @@ export class ChatController {
     @Body(new ZodBody(updateConversationSchema)) input: UpdateConversationInput,
     @CurrentUser() user: AccessTokenClaims,
   ): Promise<ConversationTranscript> {
-    await this.conversations.setHint(id, input.departmentSlug);
+    await this.conversations.setHint(id, input.departmentSlug, user.userId);
 
     return this.conversations.transcript(
       id,
-      user.userId,
+      user,
     ) as Promise<ConversationTranscript>;
   }
 

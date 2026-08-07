@@ -1,8 +1,10 @@
+import { hasRole, type UserRole } from '@chatbot/contracts';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import type { Transaction } from '../db/database.tokens';
 import { conversations } from '../db/schema/conversation';
 import { departments } from '../db/schema/department';
+import { escalationTickets } from '../db/schema/escalation';
 import { imageAssets, messageAttachments } from '../db/schema/image';
 import { messageRatings, messages } from '../db/schema/message';
 import type {
@@ -387,32 +389,42 @@ export class ConversationService {
   readonly setHint = async (
     conversationId: string,
     slug: string | null,
+    userId: string,
   ): Promise<void> => {
     await this.tenantDb.run(async (tx) => {
-      if (slug === null) {
-        await tx
-          .update(conversations)
-          .set({ departmentHintId: null })
-          .where(eq(conversations.id, conversationId));
+      let departmentId: string | null = null;
 
-        return;
+      if (slug !== null) {
+        const found = await tx
+          .select({ id: departments.id })
+          .from(departments)
+          .where(
+            and(eq(departments.slug, slug), eq(departments.isActive, true)),
+          )
+          .limit(1);
+
+        const department = found[0];
+        if (department === undefined) {
+          throw new NotFoundException('Phòng ban không tồn tại');
+        }
+
+        departmentId = department.id;
       }
 
-      const found = await tx
-        .select({ id: departments.id })
-        .from(departments)
-        .where(and(eq(departments.slug, slug), eq(departments.isActive, true)))
-        .limit(1);
-
-      const department = found[0];
-      if (department === undefined) {
-        throw new NotFoundException('Phòng ban không tồn tại');
-      }
-
-      await tx
+      const updated = await tx
         .update(conversations)
-        .set({ departmentHintId: department.id })
-        .where(eq(conversations.id, conversationId));
+        .set({ departmentHintId: departmentId })
+        .where(
+          and(
+            eq(conversations.id, conversationId),
+            eq(conversations.userId, userId),
+          ),
+        )
+        .returning({ id: conversations.id });
+
+      if (updated[0] === undefined) {
+        throw new NotFoundException('Không tìm thấy hội thoại');
+      }
     });
   };
 
@@ -426,7 +438,13 @@ export class ConversationService {
       const found = await tx
         .select({ id: messages.id })
         .from(messages)
-        .where(eq(messages.id, input.messageId))
+        .innerJoin(conversations, eq(conversations.id, messages.conversationId))
+        .where(
+          and(
+            eq(messages.id, input.messageId),
+            eq(conversations.userId, input.ratedBy),
+          ),
+        )
         .limit(1);
 
       if (found[0] === undefined) {
@@ -449,11 +467,21 @@ export class ConversationService {
     });
   };
 
-  readonly transcript = async (conversationId: string, viewerId: string) =>
+  /**
+   * Người ngoài hội thoại chỉ đọc được khi đang xử lý phiếu chuyển của chính
+   * hội thoại đó — FR-5 bắt người phụ trách phải thấy ngữ cảnh để trả lời.
+   * Không có phiếu thì trả 404 y như hội thoại không tồn tại, đừng xác nhận
+   * cho người hỏi biết là có một hội thoại mang id đó.
+   */
+  readonly transcript = async (
+    conversationId: string,
+    viewer: { userId: string; role: UserRole },
+  ) =>
     this.tenantDb.run(async (tx) => {
       const found = await tx
         .select({
           id: conversations.id,
+          ownerId: conversations.userId,
           hintSlug: departments.slug,
           hintName: departments.name,
         })
@@ -468,6 +496,21 @@ export class ConversationService {
       const conversation = found[0];
       if (conversation === undefined) {
         throw new NotFoundException('Không tìm thấy hội thoại');
+      }
+
+      if (conversation.ownerId !== viewer.userId) {
+        const tickets = await tx
+          .select({ id: escalationTickets.id })
+          .from(escalationTickets)
+          .where(eq(escalationTickets.conversationId, conversationId))
+          .limit(1);
+
+        const handling =
+          hasRole(viewer.role, 'manager') && tickets[0] !== undefined;
+
+        if (!handling) {
+          throw new NotFoundException('Không tìm thấy hội thoại');
+        }
       }
 
       const rows = await tx
@@ -496,7 +539,7 @@ export class ConversationService {
                 messageRatings.messageId,
                 rows.map((row) => row.id),
               ),
-              eq(messageRatings.ratedBy, viewerId),
+              eq(messageRatings.ratedBy, viewer.userId),
             ),
           );
 
