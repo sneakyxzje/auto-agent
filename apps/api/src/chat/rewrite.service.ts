@@ -7,6 +7,8 @@ export type HistoryTurn = {
   question: string;
   /** Chỉ phần đầu câu trả lời — đủ để hiểu mạch, không đủ để nhiễu. */
   answerPreview: string;
+  /** Caption ảnh lượt đó, để "cái này sửa sao?" giải quyết được tham chiếu. */
+  imageCaption: string | null;
 };
 
 export type RewriteResult = {
@@ -58,10 +60,14 @@ export class RewriteService {
     }
 
     const transcript = history
-      .map(
-        (turn, index) =>
-          `Lượt ${index + 1}\nNgười dùng: ${turn.question}\nBot: ${turn.answerPreview}`,
-      )
+      .map((turn, index) => {
+        const image =
+          turn.imageCaption === null
+            ? ''
+            : `\n[Người dùng gửi kèm ảnh: ${turn.imageCaption}]`;
+
+        return `Lượt ${index + 1}\nNgười dùng: ${turn.question}${image}\nBot: ${turn.answerPreview}`;
+      })
       .join('\n\n');
 
     const { value, usage } = await this.llm.structured({

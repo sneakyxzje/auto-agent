@@ -11,11 +11,24 @@ export type StructuredCall<T> = {
   jsonSchema: Record<string, unknown>;
   parse: (value: unknown) => T;
   maxOutputTokens?: number;
+  /** Đặt 0 cho các quyết định phân loại cần lặp lại được giữa các lần gọi. */
+  temperature?: number;
 };
 
 export type StructuredResult<T> = {
   value: T;
   usage: TokenUsage;
+};
+
+export type VisionStructuredCall<T> = {
+  model: string;
+  system: string;
+  text: string;
+  images: { mime: string; base64: string }[];
+  schemaName: string;
+  jsonSchema: Record<string, unknown>;
+  parse: (value: unknown) => T;
+  maxOutputTokens?: number;
 };
 
 export type StreamCall = {
@@ -50,32 +63,101 @@ export class LlmService {
    */
   readonly structured = async <T>(
     call: StructuredCall<T>,
-  ): Promise<StructuredResult<T>> => {
-    this.assertModel(call.model);
-
-    const completion = await this.client.chat.completions.create({
+  ): Promise<StructuredResult<T>> =>
+    this.requestStructured({
       model: call.model,
       messages: [
         { role: 'system', content: call.system },
         { role: 'user', content: call.user },
       ],
-      max_completion_tokens: call.maxOutputTokens ?? 512,
-      response_format: {
-        type: 'json_schema',
-        json_schema: {
-          name: call.schemaName,
-          strict: true,
-          schema: call.jsonSchema,
-        },
-      },
+      maxOutputTokens: call.maxOutputTokens ?? 512,
+      ...(call.temperature === undefined
+        ? {}
+        : { temperature: call.temperature }),
+      schemaName: call.schemaName,
+      jsonSchema: call.jsonSchema,
+      parse: call.parse,
     });
 
-    const content = completion.choices[0]?.message.content ?? '';
+  readonly visionStructured = async <T>(
+    call: VisionStructuredCall<T>,
+  ): Promise<StructuredResult<T>> =>
+    this.requestStructured({
+      model: call.model,
+      messages: [
+        { role: 'system', content: call.system },
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: call.text },
+            ...call.images.map((image) => ({
+              type: 'image_url' as const,
+              image_url: {
+                url: `data:${image.mime};base64,${image.base64}`,
+              },
+            })),
+          ],
+        },
+      ],
+      maxOutputTokens: call.maxOutputTokens ?? 700,
+      temperature: 0,
+      schemaName: call.schemaName,
+      jsonSchema: call.jsonSchema,
+      parse: call.parse,
+    });
 
-    return {
-      value: call.parse(JSON.parse(content)),
-      usage: usageOf(completion.usage),
-    };
+  /**
+   * Nhà cung cấp thỉnh thoảng trả JSON đứt giữa chừng (đã bắt gặp lặp lại trong
+   * gate lẫn OCR). Thử lại đúng một lần trước khi bỏ cuộc — không phải vá schema,
+   * chỉ chống trục trặc thoáng qua ở tầng mạng/model.
+   */
+  private readonly requestStructured = async <T>(input: {
+    model: string;
+    messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[];
+    maxOutputTokens: number;
+    temperature?: number;
+    schemaName: string;
+    jsonSchema: Record<string, unknown>;
+    parse: (value: unknown) => T;
+  }): Promise<StructuredResult<T>> => {
+    this.assertModel(input.model);
+
+    let lastError: unknown;
+
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      const completion = await this.client.chat.completions.create({
+        model: input.model,
+        messages: input.messages,
+        max_completion_tokens: input.maxOutputTokens,
+        ...(input.temperature === undefined
+          ? {}
+          : { temperature: input.temperature }),
+        response_format: {
+          type: 'json_schema',
+          json_schema: {
+            name: input.schemaName,
+            strict: true,
+            schema: input.jsonSchema,
+          },
+        },
+      });
+
+      const content = completion.choices[0]?.message.content ?? '';
+
+      try {
+        return {
+          value: input.parse(JSON.parse(content)),
+          usage: usageOf(completion.usage),
+        };
+      } catch (error) {
+        lastError = error;
+        this.logger.warn(
+          `Model trả JSON hỏng cho ${input.schemaName} (lần ${attempt}/2)`,
+        );
+      }
+    }
+
+    throw lastError;
   };
 
   /**

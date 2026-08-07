@@ -12,6 +12,7 @@ import { TenantModule } from './core/tenant/tenant.module';
 import { DrizzleModule } from './db/drizzle.module';
 import { EscalationModule } from './escalation/escalation.module';
 import { HealthModule } from './health/health.module';
+import { ImageModule } from './image/image.module';
 import { DepartmentModule } from './knowledge/department/department.module';
 import { DocumentModule } from './knowledge/document/document.module';
 import { IngestModule } from './knowledge/ingest/ingest.module';
@@ -36,6 +37,7 @@ import { StorageModule } from './storage/storage.module';
     IngestModule,
     SearchModule,
     EscalationModule,
+    ImageModule,
     ChatModule,
     HealthModule,
   ],

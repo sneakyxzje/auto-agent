@@ -3,7 +3,12 @@ import { Queue } from 'bullmq';
 import IORedis from 'ioredis';
 import { ENV } from '../config/config.module';
 import type { Env } from '../config/env';
-import { INGEST_QUEUE, type IngestJob } from './queue.tokens';
+import {
+  IMAGE_CLEANUP_QUEUE,
+  type ImageCleanupJob,
+  INGEST_QUEUE,
+  type IngestJob,
+} from './queue.tokens';
 
 export * from './queue.tokens';
 
@@ -32,13 +37,31 @@ export const createQueueConnection = (env: Env): IORedis =>
         }),
       inject: [ENV],
     },
+    {
+      provide: IMAGE_CLEANUP_QUEUE,
+      useFactory: (env: Env): Queue<ImageCleanupJob> =>
+        new Queue<ImageCleanupJob>('image-cleanup', {
+          connection: createQueueConnection(env),
+          defaultJobOptions: {
+            attempts: 3,
+            backoff: { type: 'exponential', delay: 60_000 },
+            removeOnComplete: 20,
+            removeOnFail: 100,
+          },
+        }),
+      inject: [ENV],
+    },
   ],
-  exports: [INGEST_QUEUE],
+  exports: [INGEST_QUEUE, IMAGE_CLEANUP_QUEUE],
 })
 export class QueueModule implements OnModuleDestroy {
-  constructor(@Inject(INGEST_QUEUE) private readonly ingestQueue: Queue) {}
+  constructor(
+    @Inject(INGEST_QUEUE) private readonly ingestQueue: Queue,
+    @Inject(IMAGE_CLEANUP_QUEUE) private readonly imageCleanupQueue: Queue,
+  ) {}
 
   onModuleDestroy = async (): Promise<void> => {
     await this.ingestQueue.close();
+    await this.imageCleanupQueue.close();
   };
 }

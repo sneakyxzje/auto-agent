@@ -3,6 +3,8 @@ import {
   type ConversationSummary,
   type ConversationTranscript,
   chatRequestSchema,
+  type RateMessageInput,
+  rateMessageSchema,
   type SseEvent,
   type UpdateConversationInput,
   updateConversationSchema,
@@ -10,7 +12,10 @@ import {
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -29,7 +34,6 @@ import { ConversationService } from './conversation.service';
 const encodeEvent = (event: SseEvent): string =>
   `data: ${JSON.stringify(event)}\n\n`;
 
-/** Thanh bên chỉ hiện chừng này, không làm phân trang cho tới khi thấy cần. */
 const HISTORY_LIMIT = 30;
 
 @Controller()
@@ -66,6 +70,7 @@ export class ChatController {
       {
         conversationId: input.conversationId ?? null,
         message: input.message,
+        imageIds: input.imageIds ?? [],
         departmentSlug: input.departmentSlug ?? null,
       },
       user,
@@ -98,17 +103,49 @@ export class ChatController {
   @Get('conversations/:id')
   async transcript(
     @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AccessTokenClaims,
   ): Promise<ConversationTranscript> {
-    return this.conversations.transcript(id) as Promise<ConversationTranscript>;
+    return this.conversations.transcript(
+      id,
+      user.userId,
+    ) as Promise<ConversationTranscript>;
   }
 
   @Patch('conversations/:id')
   async setHint(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(new ZodBody(updateConversationSchema)) input: UpdateConversationInput,
+    @CurrentUser() user: AccessTokenClaims,
   ): Promise<ConversationTranscript> {
     await this.conversations.setHint(id, input.departmentSlug);
 
-    return this.conversations.transcript(id) as Promise<ConversationTranscript>;
+    return this.conversations.transcript(
+      id,
+      user.userId,
+    ) as Promise<ConversationTranscript>;
+  }
+
+  @Post('messages/:id/rate')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async rate(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body(new ZodBody(rateMessageSchema)) input: RateMessageInput,
+    @CurrentUser() user: AccessTokenClaims,
+  ): Promise<void> {
+    await this.conversations.rateMessage({
+      messageId: id,
+      rating: input.rating,
+      comment: input.comment ?? null,
+      ratedBy: user.userId,
+    });
+  }
+
+  @Delete('conversations/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteConversation(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AccessTokenClaims,
+  ): Promise<void> {
+    await this.conversations.delete(id, user.userId);
   }
 }

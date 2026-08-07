@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { and, desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import type { Transaction } from '../db/database.tokens';
 import { conversations } from '../db/schema/conversation';
 import { departments } from '../db/schema/department';
-import { messages } from '../db/schema/message';
+import { imageAssets, messageAttachments } from '../db/schema/image';
+import { messageRatings, messages } from '../db/schema/message';
 import type {
   CostBreakdown,
   LatencyBreakdown,
@@ -194,18 +195,53 @@ export class ConversationService {
   ): Promise<HistoryTurn[]> =>
     this.tenantDb.run(async (tx) => {
       const rows = await tx
-        .select({ role: messages.role, content: messages.content })
+        .select({
+          id: messages.id,
+          role: messages.role,
+          content: messages.content,
+        })
         .from(messages)
         .where(eq(messages.conversationId, conversationId))
         .orderBy(desc(messages.createdAt))
         .limit(turns * 2);
+
+      const userIds = rows
+        .filter((row) => row.role === 'user')
+        .map((row) => row.id);
+
+      const captionByMessage = new Map<string, string>();
+      if (userIds.length > 0) {
+        const captions = await tx
+          .select({
+            messageId: messageAttachments.messageId,
+            caption: imageAssets.caption,
+          })
+          .from(messageAttachments)
+          .innerJoin(
+            imageAssets,
+            eq(imageAssets.id, messageAttachments.imageAssetId),
+          )
+          .where(inArray(messageAttachments.messageId, userIds))
+          .orderBy(messageAttachments.ord);
+
+        for (const row of captions) {
+          const caption = (row.caption ?? '').trim();
+          if (caption.length > 0 && !captionByMessage.has(row.messageId)) {
+            captionByMessage.set(row.messageId, caption);
+          }
+        }
+      }
 
       const ordered = rows.reverse();
       const history: HistoryTurn[] = [];
 
       for (const row of ordered) {
         if (row.role === 'user') {
-          history.push({ question: row.content, answerPreview: '' });
+          history.push({
+            question: row.content,
+            answerPreview: '',
+            imageCaption: captionByMessage.get(row.id) ?? null,
+          });
           continue;
         }
 
@@ -219,13 +255,16 @@ export class ConversationService {
     });
 
   readonly appendUserMessage = async (input: {
+    id: string;
     conversationId: string;
     content: string;
     rewrittenQuery: string;
     isFollowup: boolean;
+    imageAssetIds: string[];
   }): Promise<void> => {
     await this.tenantDb.run(async (tx, tenantId) => {
       await tx.insert(messages).values({
+        id: input.id,
         tenantId,
         conversationId: input.conversationId,
         role: 'user',
@@ -233,6 +272,17 @@ export class ConversationService {
         rewrittenQuery: input.rewrittenQuery,
         isFollowup: input.isFollowup,
       });
+
+      if (input.imageAssetIds.length > 0) {
+        await tx.insert(messageAttachments).values(
+          input.imageAssetIds.map((imageAssetId, ord) => ({
+            tenantId,
+            messageId: input.id,
+            imageAssetId,
+            ord,
+          })),
+        );
+      }
 
       await tx
         .update(conversations)
@@ -263,6 +313,27 @@ export class ConversationService {
         .update(conversations)
         .set({ lastActivityAt: new Date() })
         .where(eq(conversations.id, record.conversationId));
+    });
+  };
+
+  readonly delete = async (
+    conversationId: string,
+    userId: string,
+  ): Promise<void> => {
+    await this.tenantDb.run(async (tx) => {
+      const deleted = await tx
+        .delete(conversations)
+        .where(
+          and(
+            eq(conversations.id, conversationId),
+            eq(conversations.userId, userId),
+          ),
+        )
+        .returning({ id: conversations.id });
+
+      if (deleted.length === 0) {
+        throw new NotFoundException('Hội thoại không tồn tại');
+      }
     });
   };
 
@@ -345,7 +416,40 @@ export class ConversationService {
     });
   };
 
-  readonly transcript = async (conversationId: string) =>
+  readonly rateMessage = async (input: {
+    messageId: string;
+    rating: 'up' | 'down';
+    comment: string | null;
+    ratedBy: string;
+  }): Promise<void> => {
+    await this.tenantDb.run(async (tx, tenantId) => {
+      const found = await tx
+        .select({ id: messages.id })
+        .from(messages)
+        .where(eq(messages.id, input.messageId))
+        .limit(1);
+
+      if (found[0] === undefined) {
+        throw new NotFoundException('Không tìm thấy câu trả lời để chấm');
+      }
+
+      await tx
+        .insert(messageRatings)
+        .values({
+          tenantId,
+          messageId: input.messageId,
+          rating: input.rating,
+          comment: input.comment,
+          ratedBy: input.ratedBy,
+        })
+        .onConflictDoUpdate({
+          target: [messageRatings.messageId, messageRatings.ratedBy],
+          set: { rating: input.rating, comment: input.comment },
+        });
+    });
+  };
+
+  readonly transcript = async (conversationId: string, viewerId: string) =>
     this.tenantDb.run(async (tx) => {
       const found = await tx
         .select({
@@ -378,6 +482,52 @@ export class ConversationService {
         .where(eq(messages.conversationId, conversationId))
         .orderBy(messages.createdAt);
 
+      const ratingByMessage = new Map<string, 'up' | 'down'>();
+      if (rows.length > 0) {
+        const ratings = await tx
+          .select({
+            messageId: messageRatings.messageId,
+            rating: messageRatings.rating,
+          })
+          .from(messageRatings)
+          .where(
+            and(
+              inArray(
+                messageRatings.messageId,
+                rows.map((row) => row.id),
+              ),
+              eq(messageRatings.ratedBy, viewerId),
+            ),
+          );
+
+        for (const row of ratings) {
+          ratingByMessage.set(row.messageId, row.rating);
+        }
+      }
+
+      const attachmentsByMessage = new Map<string, { imageId: string }[]>();
+      if (rows.length > 0) {
+        const attachmentRows = await tx
+          .select({
+            messageId: messageAttachments.messageId,
+            imageAssetId: messageAttachments.imageAssetId,
+          })
+          .from(messageAttachments)
+          .where(
+            inArray(
+              messageAttachments.messageId,
+              rows.map((row) => row.id),
+            ),
+          )
+          .orderBy(messageAttachments.ord);
+
+        for (const row of attachmentRows) {
+          const list = attachmentsByMessage.get(row.messageId) ?? [];
+          list.push({ imageId: row.imageAssetId });
+          attachmentsByMessage.set(row.messageId, list);
+        }
+      }
+
       return {
         id: conversation.id,
         departmentSlug: conversation.hintSlug,
@@ -387,6 +537,8 @@ export class ConversationService {
           role: row.role,
           content: row.content,
           citedChunkIds: row.citedChunkIds ?? [],
+          attachments: attachmentsByMessage.get(row.id) ?? [],
+          myRating: ratingByMessage.get(row.id) ?? null,
           createdAt: row.createdAt.toISOString(),
         })),
       };
@@ -432,5 +584,11 @@ export class ConversationService {
     }
 
     return conversation.id;
+  };
+
+  readonly deleteConversation = async (id: string): Promise<void> => {
+    await this.tenantDb.run(async (tx) => {
+      await tx.delete(conversations).where(eq(conversations.id, id));
+    });
   };
 }
