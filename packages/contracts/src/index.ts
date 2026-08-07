@@ -6,3 +6,4 @@ export * from './common.js';
 export * from './department.js';
 export * from './document.js';
 export * from './escalation.js';
+export * from './image.js';

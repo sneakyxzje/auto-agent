@@ -4,7 +4,8 @@ import { departmentSlugSchema } from './common.js';
 /** POST /api/v1/chat */
 export const chatRequestSchema = z.object({
   conversationId: z.uuid().optional(),
-  message: z.string().min(1).max(4000),
+  /** Được rỗng khi gửi kèm ảnh — câu hỏi lấy từ nội dung ảnh. */
+  message: z.string().max(4000),
   /** Id của ảnh đã upload trước đó. */
   imageIds: z.array(z.uuid()).max(3).optional(),
   /** Từ lệnh `/tenphongban`. Bỏ trống thì giữ bộ lọc cũ của hội thoại. */
@@ -93,6 +94,16 @@ export const updateConversationSchema = z.object({
 });
 export type UpdateConversationInput = z.infer<typeof updateConversationSchema>;
 
+/**
+ * POST /api/v1/messages/{id}/rate — chấm theo TỪNG câu trả lời, không phải cả
+ * hội thoại: 5 lượt mà chỉ 1 lượt sai thì phải biết đích danh lượt nào.
+ */
+export const rateMessageSchema = z.object({
+  rating: z.enum(['up', 'down']),
+  comment: z.string().max(1000).optional(),
+});
+export type RateMessageInput = z.infer<typeof rateMessageSchema>;
+
 /** GET /api/v1/conversations/{id} — tải lại lịch sử khi refresh trang. */
 export const conversationTranscriptSchema = z.object({
   id: z.uuid(),
@@ -105,6 +116,8 @@ export const conversationTranscriptSchema = z.object({
       role: z.enum(['user', 'assistant']),
       content: z.string(),
       citedChunkIds: z.array(z.string()),
+      attachments: z.array(z.object({ imageId: z.uuid() })).default([]),
+      myRating: z.enum(['up', 'down']).nullable().default(null),
       createdAt: z.string(),
     }),
   ),
