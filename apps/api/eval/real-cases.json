@@ -1,0 +1,93 @@
+{
+  "generatedAt": "2026-08-06T08:45:00.000Z",
+  "tenantId": "ba8df478-6e73-4cbe-a574-955d55bba17b",
+  "generatorModel": "manual-from-real-chat",
+  "questions": [
+    {
+      "id": "real-01-link-san-pham",
+      "category": "deep",
+      "question": "Cách lấy link sản phẩm để gắn post quảng cáo",
+      "expectAnswer": true,
+      "documentId": "",
+      "documentTitle": "QUY TRÌNH ADS MXH",
+      "requiredChunkIds": [],
+      "requiredSnippets": ["lấy link sản phẩm để gắn post quảng cáo"]
+    },
+    {
+      "id": "real-02-post-reels",
+      "category": "deep",
+      "question": "các bước dùng post-reels chạy ads",
+      "expectAnswer": true,
+      "documentId": "",
+      "documentTitle": "QUY TRÌNH ADS MXH",
+      "requiredChunkIds": [],
+      "requiredSnippets": ["Post Reels chạy Ads"]
+    },
+    {
+      "id": "real-03-phan-loai-khach-hang",
+      "category": "deep",
+      "question": "QUY TRÌNH PHÂN LOẠI KHÁCH HÀNG THEO MỤC TIÊU CHUYỂN ĐỔI",
+      "expectAnswer": true,
+      "documentId": "",
+      "documentTitle": "QUY TRÌNH LÀM VIỆC VỊ TRÍ ACCOUNT 2026 (UPDATE T1.26)",
+      "requiredChunkIds": [],
+      "requiredSnippets": ["phân loại khách hàng theo mục tiêu chuyển đổi"]
+    },
+    {
+      "id": "real-04-meeting-khach-hang",
+      "category": "paraphrase",
+      "question": "meeting với khách hàng",
+      "expectAnswer": true,
+      "documentId": "",
+      "documentTitle": "QUY TRÌNH LÀM VIỆC VỊ TRÍ ACCOUNT 2026 (UPDATE T1.26)",
+      "requiredChunkIds": [],
+      "requiredSnippets": ["bắt buộc meeting"]
+    },
+    {
+      "id": "real-05-quy-dinh-cong-ty",
+      "category": "synthesis",
+      "question": "Quy định công ty byscom",
+      "expectAnswer": true,
+      "documentId": "",
+      "documentTitle": "TL1",
+      "requiredChunkIds": []
+    },
+    {
+      "id": "real-06-di-muon-5-tieng-a",
+      "category": "direct",
+      "question": "Nếu đi muộn 5 tiếng thì sao?",
+      "expectAnswer": true,
+      "documentId": "",
+      "documentTitle": "TL1",
+      "requiredChunkIds": []
+    },
+    {
+      "id": "real-07-di-muon-5-tieng-b",
+      "category": "direct",
+      "question": "Nếu đi muộn 5 tiếng thì sao?",
+      "expectAnswer": true,
+      "documentId": "",
+      "documentTitle": "TL1",
+      "requiredChunkIds": []
+    },
+    {
+      "id": "real-08-thai-san",
+      "category": "trap",
+      "question": "Chế độ nghỉ thai sản",
+      "expectAnswer": false,
+      "documentId": "",
+      "documentTitle": "",
+      "requiredChunkIds": []
+    },
+    {
+      "id": "real-09-muc-nao-bang-gia",
+      "category": "deep",
+      "question": "Bảng giá dịch vụ Booking TAP với gói Basic và Standard nằm ở mục nào của tài liệu?",
+      "expectAnswer": true,
+      "documentId": "",
+      "documentTitle": "QUY TRÌNH LÀM VIỆC VỊ TRÍ BOOKING DỊCH VỤ 2026",
+      "requiredChunkIds": [],
+      "requiredSnippets": ["2. Quy trình triển khai Dịch vụ Booking và Booking TAP"]
+    }
+  ]
+}

@@ -1,0 +1,420 @@
+{
+  "generatedAt": "2026-08-07T02:07:10.921Z",
+  "tenantId": "ba8df478-6e73-4cbe-a574-955d55bba17b",
+  "generatorModel": "gpt-4.1-mini",
+  "questions": [
+    {
+      "id": "q001-direct",
+      "category": "direct",
+      "question": "Byscom cung cấp bộ giải pháp toàn diện bao gồm những gì?",
+      "expectAnswer": true,
+      "documentId": "fd03fdbe-7d04-49a5-a306-bbd3c3c3193e",
+      "documentTitle": "TL1",
+      "requiredChunkIds": [
+        "a594fcb9-00c4-4cc0-aa3f-4bf4f4b24c25"
+      ]
+    },
+    {
+      "id": "q002-direct",
+      "category": "direct",
+      "question": "Nhân sự 1 tháng được phép xin đến muộn, về sớm bao nhiêu lần và mỗi lần không quá bao nhiêu tiếng?",
+      "expectAnswer": true,
+      "documentId": "fd03fdbe-7d04-49a5-a306-bbd3c3c3193e",
+      "documentTitle": "TL1",
+      "requiredChunkIds": [
+        "a9c23911-3755-47e7-9b9d-903fe39dc022"
+      ]
+    },
+    {
+      "id": "q003-paraphrase",
+      "category": "paraphrase",
+      "question": "Byscom làm thế nào để đồng hành cùng doanh nghiệp phát triển bền vững trên Thương Mại Điện Tử?",
+      "expectAnswer": true,
+      "documentId": "fd03fdbe-7d04-49a5-a306-bbd3c3c3193e",
+      "documentTitle": "TL1",
+      "requiredChunkIds": [
+        "a594fcb9-00c4-4cc0-aa3f-4bf4f4b24c25"
+      ]
+    },
+    {
+      "id": "q004-paraphrase",
+      "category": "paraphrase",
+      "question": "Nhân viên có được phép ra ngoài làm việc trong giờ hành chính mà không báo cáo hay không?",
+      "expectAnswer": true,
+      "documentId": "fd03fdbe-7d04-49a5-a306-bbd3c3c3193e",
+      "documentTitle": "TL1",
+      "requiredChunkIds": [
+        "a9c23911-3755-47e7-9b9d-903fe39dc022"
+      ]
+    },
+    {
+      "id": "q005-deep",
+      "category": "deep",
+      "question": "Triết lý kinh doanh của Byscom là gì và công ty thể hiện điều đó như thế nào thông qua mục tiêu kinh doanh?",
+      "expectAnswer": true,
+      "documentId": "fd03fdbe-7d04-49a5-a306-bbd3c3c3193e",
+      "documentTitle": "TL1",
+      "requiredChunkIds": [
+        "a594fcb9-00c4-4cc0-aa3f-4bf4f4b24c25"
+      ]
+    },
+    {
+      "id": "q006-synthesis",
+      "category": "synthesis",
+      "question": "Địa chỉ trụ sở chính của Công ty TNHH Công nghệ và Truyền thông Byscom tại Hà Nội là gì và quy định về việc gửi Email nội bộ hoặc cho khách hàng/đối tác theo sổ tay nhân viên của công ty là như thế nào?",
+      "expectAnswer": true,
+      "documentId": "fd03fdbe-7d04-49a5-a306-bbd3c3c3193e",
+      "documentTitle": "TL1",
+      "requiredChunkIds": [
+        "a594fcb9-00c4-4cc0-aa3f-4bf4f4b24c25",
+        "37acf925-7cfa-4aec-b4b9-66e848d75def"
+      ]
+    },
+    {
+      "id": "q007-direct",
+      "category": "direct",
+      "question": "Theo quy trình set Ads, các page phải giới hạn quốc gia nào để khi chạy Ads không bị phân phối sang quốc gia khác?",
+      "expectAnswer": true,
+      "documentId": "4393a55f-0f8e-4818-8eff-d20ab82cea5b",
+      "documentTitle": "QUY TRÌNH ADS MXH",
+      "requiredChunkIds": [
+        "6cc034ee-5e4d-4f8e-9e87-4aa6aafb5a49"
+      ]
+    },
+    {
+      "id": "q008-direct",
+      "category": "direct",
+      "question": "Trong ví dụ giả định, tỷ lệ hoa hồng là bao nhiêu phần trăm?",
+      "expectAnswer": true,
+      "documentId": "4393a55f-0f8e-4818-8eff-d20ab82cea5b",
+      "documentTitle": "QUY TRÌNH ADS MXH",
+      "requiredChunkIds": [
+        "85de2f7a-ae18-4628-9d05-a0f4b8cc667c"
+      ]
+    },
+    {
+      "id": "q009-paraphrase",
+      "category": "paraphrase",
+      "question": "Khi chạy chương trình quảng cáo, các trang Facebook cần được giới hạn hiển thị chỉ trong nước nào để tránh lỗi phân phối?",
+      "expectAnswer": true,
+      "documentId": "4393a55f-0f8e-4818-8eff-d20ab82cea5b",
+      "documentTitle": "QUY TRÌNH ADS MXH",
+      "requiredChunkIds": [
+        "6cc034ee-5e4d-4f8e-9e87-4aa6aafb5a49"
+      ]
+    },
+    {
+      "id": "q010-paraphrase",
+      "category": "paraphrase",
+      "question": "Khi hoa hồng đạt mức 55% nhưng chi phí cho mỗi lượt nhấn và số lượt nhấn trên mỗi đơn hàng cao, nhóm sẽ làm gì trong vài ngày tới?",
+      "expectAnswer": true,
+      "documentId": "4393a55f-0f8e-4818-8eff-d20ab82cea5b",
+      "documentTitle": "QUY TRÌNH ADS MXH",
+      "requiredChunkIds": [
+        "85de2f7a-ae18-4628-9d05-a0f4b8cc667c"
+      ]
+    },
+    {
+      "id": "q011-deep",
+      "category": "deep",
+      "question": "Làm thế nào để ẩn bình luận chứa từ hoặc cụm từ xúc phạm trên Trang của bạn?",
+      "expectAnswer": true,
+      "documentId": "4393a55f-0f8e-4818-8eff-d20ab82cea5b",
+      "documentTitle": "QUY TRÌNH ADS MXH",
+      "requiredChunkIds": [
+        "654539a4-2c6e-44f2-b963-154a751e2b6f"
+      ]
+    },
+    {
+      "id": "q012-synthesis",
+      "category": "synthesis",
+      "question": "Trong quy trình chạy quảng cáo trên mạng xã hội cho chương trình Affiliate tại Shopee, để tối ưu hiệu quả quảng cáo và đảm bảo giới hạn đối tượng mục tiêu, cần chú ý những yêu cầu và lưu ý quan trọng nào đối với việc tạo và quản lý Fanpage cũng như lịch chạy chiến dịch Ads?",
+      "expectAnswer": true,
+      "documentId": "4393a55f-0f8e-4818-8eff-d20ab82cea5b",
+      "documentTitle": "QUY TRÌNH ADS MXH",
+      "requiredChunkIds": [
+        "6cc034ee-5e4d-4f8e-9e87-4aa6aafb5a49",
+        "9b1b0507-88c9-4188-9030-7ef3ccedf364"
+      ]
+    },
+    {
+      "id": "q013-direct",
+      "category": "direct",
+      "question": "Tiêu chí nào để chọn ảnh trong file cào sản phẩm?",
+      "expectAnswer": true,
+      "documentId": "144a15d4-f05f-4d87-945f-7315f06129d1",
+      "documentTitle": "QUY TRÌNH CHẠY TOOL LOCAL NỘI BỘ",
+      "requiredChunkIds": [
+        "3641462d-af40-4109-872a-cb52871e64af"
+      ]
+    },
+    {
+      "id": "q014-direct",
+      "category": "direct",
+      "question": "Đường dẫn chứa file tool Ảnh Gemini/Grok là gì?",
+      "expectAnswer": true,
+      "documentId": "144a15d4-f05f-4d87-945f-7315f06129d1",
+      "documentTitle": "QUY TRÌNH CHẠY TOOL LOCAL NỘI BỘ",
+      "requiredChunkIds": [
+        "415daa9e-7291-48b7-ab35-b8296a396e10"
+      ]
+    },
+    {
+      "id": "q015-paraphrase",
+      "category": "paraphrase",
+      "question": "Khi chọn ảnh trong file cào, nếu phát hiện ảnh không hợp lệ, nhân viên nên làm gì để thay ảnh?",
+      "expectAnswer": true,
+      "documentId": "144a15d4-f05f-4d87-945f-7315f06129d1",
+      "documentTitle": "QUY TRÌNH CHẠY TOOL LOCAL NỘI BỘ",
+      "requiredChunkIds": [
+        "3641462d-af40-4109-872a-cb52871e64af"
+      ]
+    },
+    {
+      "id": "q016-paraphrase",
+      "category": "paraphrase",
+      "question": "Dữ liệu trong ví dụ được lưu trữ trên máy tính tại thư mục nào?",
+      "expectAnswer": true,
+      "documentId": "144a15d4-f05f-4d87-945f-7315f06129d1",
+      "documentTitle": "QUY TRÌNH CHẠY TOOL LOCAL NỘI BỘ",
+      "requiredChunkIds": [
+        "415daa9e-7291-48b7-ab35-b8296a396e10"
+      ]
+    },
+    {
+      "id": "q017-deep",
+      "category": "deep",
+      "question": "Nếu ảnh ở cột IMAGE không đạt tiêu chí, người dùng cần làm gì để cập nhật ảnh trong file cào sản phẩm?",
+      "expectAnswer": true,
+      "documentId": "144a15d4-f05f-4d87-945f-7315f06129d1",
+      "documentTitle": "QUY TRÌNH CHẠY TOOL LOCAL NỘI BỘ",
+      "requiredChunkIds": [
+        "3641462d-af40-4109-872a-cb52871e64af"
+      ]
+    },
+    {
+      "id": "q018-synthesis",
+      "category": "synthesis",
+      "question": "Trong quy trình chạy tool local nội bộ, tiêu chí chọn ảnh trong file cào sản phẩm là gì và cách ghép các video thành phần và voice trong phần mềm AutoVideoMeta để tạo video hoàn chỉnh như thế nào?",
+      "expectAnswer": true,
+      "documentId": "144a15d4-f05f-4d87-945f-7315f06129d1",
+      "documentTitle": "QUY TRÌNH CHẠY TOOL LOCAL NỘI BỘ",
+      "requiredChunkIds": [
+        "3641462d-af40-4109-872a-cb52871e64af",
+        "0bfcaafd-807a-4ee7-b754-f27693de6dbe"
+      ]
+    },
+    {
+      "id": "q019-direct",
+      "category": "direct",
+      "question": "Recap là hoạt động gì trong buổi họp, buổi học hoặc sự kiện?",
+      "expectAnswer": true,
+      "documentId": "423c38fc-8605-41c3-b2ce-a24b79c74cd2",
+      "documentTitle": "Kỹ Năng Viết Recap",
+      "requiredChunkIds": [
+        "e6809155-072f-4e61-9935-886a0b367af0"
+      ]
+    },
+    {
+      "id": "q020-direct",
+      "category": "direct",
+      "question": "Nên làm gì khi mới bắt đầu viết recap theo tài liệu kỹ năng viết recap?",
+      "expectAnswer": true,
+      "documentId": "423c38fc-8605-41c3-b2ce-a24b79c74cd2",
+      "documentTitle": "Kỹ Năng Viết Recap",
+      "requiredChunkIds": [
+        "789aab5b-f75e-442a-bb2d-0c4e2583d59a"
+      ]
+    },
+    {
+      "id": "q021-paraphrase",
+      "category": "paraphrase",
+      "question": "Việc ghi lại những nội dung quan trọng từ một buổi học hay cuộc họp sẽ giúp não lưu trữ thông tin như thế nào?",
+      "expectAnswer": true,
+      "documentId": "423c38fc-8605-41c3-b2ce-a24b79c74cd2",
+      "documentTitle": "Kỹ Năng Viết Recap",
+      "requiredChunkIds": [
+        "e6809155-072f-4e61-9935-886a0b367af0"
+      ]
+    },
+    {
+      "id": "q022-paraphrase",
+      "category": "paraphrase",
+      "question": "Người mới bắt đầu nên làm thế nào để ghi lại thông tin hiệu quả khi tham gia buổi đào tạo?",
+      "expectAnswer": true,
+      "documentId": "423c38fc-8605-41c3-b2ce-a24b79c74cd2",
+      "documentTitle": "Kỹ Năng Viết Recap",
+      "requiredChunkIds": [
+        "789aab5b-f75e-442a-bb2d-0c4e2583d59a"
+      ]
+    },
+    {
+      "id": "q023-deep",
+      "category": "deep",
+      "question": "Phương pháp 3 cột trong kỹ năng viết recap bao gồm những cột nào và mục đích của việc áp dụng phương pháp này là gì?",
+      "expectAnswer": true,
+      "documentId": "423c38fc-8605-41c3-b2ce-a24b79c74cd2",
+      "documentTitle": "Kỹ Năng Viết Recap",
+      "requiredChunkIds": [
+        "e6809155-072f-4e61-9935-886a0b367af0"
+      ]
+    },
+    {
+      "id": "q024-direct",
+      "category": "direct",
+      "question": "Khi nhân sự Booking tiếp nhận job ở trạng thái KH CÓ NHU CẦU, cần thực hiện các action để đưa khách hàng về trạng thái nào trong tối đa bao nhiêu ngày?",
+      "expectAnswer": true,
+      "documentId": "c6dfc671-693f-446f-af74-97259a7b0a28",
+      "documentTitle": "QUY TRÌNH LÀM VIỆC VỊ TRÍ BOOKING DỊCH VỤ 2026",
+      "requiredChunkIds": [
+        "ea726949-e939-4314-8713-724edcb446c9"
+      ]
+    },
+    {
+      "id": "q025-direct",
+      "category": "direct",
+      "question": "Bước 3 trong quy trình triển khai dịch vụ Booking là gì và nội dung chính bao gồm những gì?",
+      "expectAnswer": true,
+      "documentId": "c6dfc671-693f-446f-af74-97259a7b0a28",
+      "documentTitle": "QUY TRÌNH LÀM VIỆC VỊ TRÍ BOOKING DỊCH VỤ 2026",
+      "requiredChunkIds": [
+        "e8b929d8-fc49-4a58-b9fc-82770aa65074"
+      ]
+    },
+    {
+      "id": "q026-paraphrase",
+      "category": "paraphrase",
+      "question": "Khi nhân viên phụ trách đặt lịch nhận công việc ở trạng thái khách chưa chốt dịch vụ trong thời gian tối đa bao nhiêu ngày phải phân loại được khách hàng?",
+      "expectAnswer": true,
+      "documentId": "c6dfc671-693f-446f-af74-97259a7b0a28",
+      "documentTitle": "QUY TRÌNH LÀM VIỆC VỊ TRÍ BOOKING DỊCH VỤ 2026",
+      "requiredChunkIds": [
+        "ea726949-e939-4314-8713-724edcb446c9"
+      ]
+    },
+    {
+      "id": "q027-paraphrase",
+      "category": "paraphrase",
+      "question": "Sau khi bên đối tác đồng ý danh sách, nhân viên cần làm gì để ghi nhận điểm ngày và báo cáo tiến độ công việc?",
+      "expectAnswer": true,
+      "documentId": "c6dfc671-693f-446f-af74-97259a7b0a28",
+      "documentTitle": "QUY TRÌNH LÀM VIỆC VỊ TRÍ BOOKING DỊCH VỤ 2026",
+      "requiredChunkIds": [
+        "e8b929d8-fc49-4a58-b9fc-82770aa65074"
+      ]
+    },
+    {
+      "id": "q028-deep",
+      "category": "deep",
+      "question": "Nhân sự Booking cần làm gì khi tiếp nhận job ở trạng thái KH CÓ NHU CẦU trong quy trình làm việc vị trí Booking dịch vụ 2026?",
+      "expectAnswer": true,
+      "documentId": "c6dfc671-693f-446f-af74-97259a7b0a28",
+      "documentTitle": "QUY TRÌNH LÀM VIỆC VỊ TRÍ BOOKING DỊCH VỤ 2026",
+      "requiredChunkIds": [
+        "ea726949-e939-4314-8713-724edcb446c9"
+      ]
+    },
+    {
+      "id": "q029-synthesis",
+      "category": "synthesis",
+      "question": "Theo quy trình làm việc vị trí Booking dịch vụ 2026, nhân sự Booking cần thực hiện các bước gì để phân loại khách hàng và hoàn thành báo cáo tuần hàng tuần?",
+      "expectAnswer": true,
+      "documentId": "c6dfc671-693f-446f-af74-97259a7b0a28",
+      "documentTitle": "QUY TRÌNH LÀM VIỆC VỊ TRÍ BOOKING DỊCH VỤ 2026",
+      "requiredChunkIds": [
+        "ea726949-e939-4314-8713-724edcb446c9",
+        "2ade44ec-4399-412e-8464-13eb896e0c41"
+      ]
+    },
+    {
+      "id": "q030-trap",
+      "category": "trap",
+      "question": "BYSCOM có áp dụng chế độ làm việc ca đêm hay không?",
+      "expectAnswer": false,
+      "documentId": "fd03fdbe-7d04-49a5-a306-bbd3c3c3193e",
+      "documentTitle": "TL1",
+      "requiredChunkIds": []
+    },
+    {
+      "id": "q031-trap",
+      "category": "trap",
+      "question": "Công ty BYSCOM có chính sách thưởng theo thành tích hàng năm như thế nào?",
+      "expectAnswer": false,
+      "documentId": "fd03fdbe-7d04-49a5-a306-bbd3c3c3193e",
+      "documentTitle": "TL1",
+      "requiredChunkIds": []
+    },
+    {
+      "id": "q032-trap",
+      "category": "trap",
+      "question": "Quy trình xử lý khi chiến dịch Ads trên MXH bị từ chối duyệt diễn ra như thế nào?",
+      "expectAnswer": false,
+      "documentId": "4393a55f-0f8e-4818-8eff-d20ab82cea5b",
+      "documentTitle": "QUY TRÌNH ADS MXH",
+      "requiredChunkIds": []
+    },
+    {
+      "id": "q033-trap",
+      "category": "trap",
+      "question": "Các bước cụ thể để phân tích tâm lý khách hàng mục tiêu trong quảng cáo MXH là gì?",
+      "expectAnswer": false,
+      "documentId": "4393a55f-0f8e-4818-8eff-d20ab82cea5b",
+      "documentTitle": "QUY TRÌNH ADS MXH",
+      "requiredChunkIds": []
+    },
+    {
+      "id": "q034-trap",
+      "category": "trap",
+      "question": "Quy trình chạy tool local được triển khai lần đầu tiên vào năm nào?",
+      "expectAnswer": false,
+      "documentId": "144a15d4-f05f-4d87-945f-7315f06129d1",
+      "documentTitle": "QUY TRÌNH CHẠY TOOL LOCAL NỘI BỘ",
+      "requiredChunkIds": []
+    },
+    {
+      "id": "q035-trap",
+      "category": "trap",
+      "question": "Có trường hợp nào tool local không hoạt động sau khi setup không?",
+      "expectAnswer": false,
+      "documentId": "144a15d4-f05f-4d87-945f-7315f06129d1",
+      "documentTitle": "QUY TRÌNH CHẠY TOOL LOCAL NỘI BỘ",
+      "requiredChunkIds": []
+    },
+    {
+      "id": "q036-trap",
+      "category": "trap",
+      "question": "Kỹ năng viết recap được áp dụng như thế nào trong lĩnh vực y tế?",
+      "expectAnswer": false,
+      "documentId": "423c38fc-8605-41c3-b2ce-a24b79c74cd2",
+      "documentTitle": "Kỹ Năng Viết Recap",
+      "requiredChunkIds": []
+    },
+    {
+      "id": "q037-trap",
+      "category": "trap",
+      "question": "Có những năm nào kỹ năng viết recap bắt đầu được giảng dạy rộng rãi tại các trường đại học Việt Nam?",
+      "expectAnswer": false,
+      "documentId": "423c38fc-8605-41c3-b2ce-a24b79c74cd2",
+      "documentTitle": "Kỹ Năng Viết Recap",
+      "requiredChunkIds": []
+    },
+    {
+      "id": "q038-trap",
+      "category": "trap",
+      "question": "Quy trình xử lý khi gặp sự cố kỹ thuật trong quá trình booking dịch vụ là gì?",
+      "expectAnswer": false,
+      "documentId": "c6dfc671-693f-446f-af74-97259a7b0a28",
+      "documentTitle": "QUY TRÌNH LÀM VIỆC VỊ TRÍ BOOKING DỊCH VỤ 2026",
+      "requiredChunkIds": []
+    },
+    {
+      "id": "q039-trap",
+      "category": "trap",
+      "question": "Có các bước cụ thể nào để đào tạo nhân viên mới vị trí booking dịch vụ trong năm 2026?",
+      "expectAnswer": false,
+      "documentId": "c6dfc671-693f-446f-af74-97259a7b0a28",
+      "documentTitle": "QUY TRÌNH LÀM VIỆC VỊ TRÍ BOOKING DỊCH VỤ 2026",
+      "requiredChunkIds": []
+    }
+  ]
+}
