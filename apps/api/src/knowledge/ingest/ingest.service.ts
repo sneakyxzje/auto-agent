@@ -1,11 +1,15 @@
 import type { Readable } from 'node:stream';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
+import { ENV } from '../../config/config.module';
+import type { Env } from '../../config/env';
 import { documents } from '../../db/schema/document';
 import { TenantDb } from '../../db/tenant-db.service';
+import { LlmService } from '../../llm/llm.service';
 import { ObjectStorage } from '../../storage/object-storage.service';
 import { PublishService } from '../publish/publish.service';
-import { cleanText, extractDocumentText } from './text-extract';
+import { injectOcr, ocrEmbeddedImages } from './image-ocr';
+import { cleanText, extractDocument, markHeadingLines } from './text-extract';
 
 /** Dưới ngưỡng này thì gần như chắc chắn là PDF scan hoặc file hỏng. */
 const MIN_TEXT_CHARS = 40;
@@ -25,6 +29,8 @@ export class IngestService {
     private readonly tenantDb: TenantDb,
     private readonly storage: ObjectStorage,
     private readonly publish: PublishService,
+    private readonly llm: LlmService,
+    @Inject(ENV) private readonly env: Env,
   ) {}
 
   /**
@@ -73,8 +79,17 @@ export class IngestService {
 
     try {
       const buffer = await readAll(await this.storage.get(document.fileRef));
+      const extracted = await extractDocument(
+        buffer,
+        document.fileName ?? 'tai-lieu',
+      );
+      const ocr = await ocrEmbeddedImages(
+        this.llm,
+        this.env.LLM_MODEL_VISION,
+        extracted.images,
+      );
       const text = cleanText(
-        await extractDocumentText(buffer, document.fileName ?? 'tai-lieu'),
+        injectOcr(markHeadingLines(cleanText(extracted.text)), ocr),
       );
 
       if (text.length < MIN_TEXT_CHARS) {

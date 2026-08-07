@@ -41,7 +41,12 @@ const tableToText = (inner: string): string =>
  * mang tiền tố `#` để bộ chia đoạn nhận ra ranh giới mục.
  */
 export const htmlToText = (html: string): string => {
-  const withTables = html.replace(
+  const withImagePlaceholders = html.replace(
+    /<img[^>]*src="ocr-placeholder-(\d+)"[^>]*\/?>/gi,
+    (_, id: string) => `\n[[OCR:${id}]]\n`,
+  );
+
+  const withTables = withImagePlaceholders.replace(
     /<table[^>]*>([\s\S]*?)<\/table>/gi,
     (_, inner: string) => `\n\n${tableToText(inner)}\n\n`,
   );
