@@ -11,6 +11,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "verify:isolation": "node scripts/verify-tenant-isolation.mjs",
+    "seed:admin": "tsx scripts/seed-admin.ts",
     "eval:generate": "tsx scripts/generate-eval-set.ts",
     "eval:diagnose": "tsx scripts/diagnose-rag.ts",
     "test": "vitest run",
