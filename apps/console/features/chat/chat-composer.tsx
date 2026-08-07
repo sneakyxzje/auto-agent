@@ -5,13 +5,12 @@ import {
   type ChangeEvent,
   type FormEvent,
   type KeyboardEvent,
+  useEffect,
   useRef,
   useState,
 } from 'react';
 import type { DepartmentSummary } from '@/features/departments/api';
 import {
-  ChevronDownIcon,
-  DepartmentIcon,
   GridIcon,
   ImageIcon,
   MicIcon,
@@ -26,20 +25,23 @@ const ACCEPT_IMAGES = IMAGE_EXTENSIONS.map((extension) => `.${extension}`).join(
   ',',
 );
 
-const ALL_DEPARTMENTS = 'Tất cả phòng ban';
-
 const CHIP_CLASS =
   'bg-surface border-border text-muted hover:text-foreground flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm';
 const ROUND_BUTTON_CLASS =
   'border-border text-muted hover:text-foreground flex size-10 cursor-pointer items-center justify-center rounded-xl border bg-transparent';
+
+/** Lệnh chỉ tính khi đứng đầu ô nhập và chưa có khoảng trắng, khớp cách máy chủ tách lệnh. */
+const COMMAND_PATTERN = /^\/([a-z0-9-]*)$/;
+
+const ALL_OPTION = { slug: 'all', name: 'Tất cả phòng ban' };
+
+type CommandOption = { slug: string; name: string };
 
 type ChatComposerProps = {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
   departments: DepartmentSummary[];
-  scope: string | null;
-  onScopeChange: (slug: string | null) => void;
   busy: boolean;
   images: PendingImage[];
   onAddImages: (files: File[]) => void;
@@ -54,8 +56,6 @@ export const ChatComposer = ({
   onChange,
   onSubmit,
   departments,
-  scope,
-  onScopeChange,
   busy,
   images,
   onAddImages,
@@ -63,12 +63,28 @@ export const ChatComposer = ({
   canSend,
   compact = false,
 }: ChatComposerProps) => {
-  const [scopeOpen, setScopeOpen] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const [highlight, setHighlight] = useState(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const activeRef = useRef<HTMLButtonElement | null>(null);
 
-  const scopeName =
-    departments.find((department) => department.slug === scope)?.name ??
-    ALL_DEPARTMENTS;
+  const query = COMMAND_PATTERN.exec(value)?.[1] ?? null;
+  const options: CommandOption[] =
+    query === null
+      ? []
+      : [ALL_OPTION, ...departments].filter(
+          (option) =>
+            option.slug.includes(query) ||
+            option.name.toLowerCase().includes(query),
+        );
+
+  const open = !dismissed && options.length > 0;
+  const active = Math.min(highlight, options.length - 1);
+
+  useEffect(() => {
+    if (open) activeRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [open]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
@@ -77,7 +93,45 @@ export const ChatComposer = ({
 
   const openPicker = (): void => fileInputRef.current?.click();
 
+  const pick = (option: CommandOption): void => {
+    onChange(`/${option.slug} `);
+    setDismissed(false);
+    setHighlight(0);
+    textareaRef.current?.focus();
+  };
+
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>): void => {
+    if (open) {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        setHighlight((current) => (current + 1) % options.length);
+        return;
+      }
+
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        setHighlight(
+          (current) => (current - 1 + options.length) % options.length,
+        );
+        return;
+      }
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setDismissed(true);
+        return;
+      }
+
+      if (event.key === 'Enter' || event.key === 'Tab') {
+        const option = options[active];
+        if (option !== undefined) {
+          event.preventDefault();
+          pick(option);
+          return;
+        }
+      }
+    }
+
     if (
       event.key !== 'Enter' ||
       event.shiftKey ||
@@ -90,13 +144,44 @@ export const ChatComposer = ({
     if (!busy && canSend) onSubmit();
   };
 
+  const handleChange = (event: ChangeEvent<HTMLTextAreaElement>): void => {
+    setDismissed(false);
+    setHighlight(0);
+    onChange(event.target.value);
+  };
+
   const handleFiles = (event: ChangeEvent<HTMLInputElement>): void => {
     onAddImages(Array.from(event.target.files ?? []));
     event.target.value = '';
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="relative">
+      {open && (
+        <div className="border-border bg-surface absolute bottom-full left-0 z-20 mb-2 max-h-64 w-full max-w-sm overflow-y-auto rounded-xl border p-1 shadow-lg">
+          <p className="text-muted px-3 pt-1 pb-2 text-[11px]">
+            Chọn phòng ban rồi gõ câu hỏi — Enter để chọn, Esc để bỏ qua
+          </p>
+
+          {options.map((option, index) => (
+            <button
+              key={option.slug}
+              ref={index === active ? activeRef : null}
+              type="button"
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => pick(option)}
+              onMouseEnter={() => setHighlight(index)}
+              className={`flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm ${
+                index === active ? 'bg-surface-secondary' : 'bg-transparent'
+              }`}
+            >
+              <span className="text-muted shrink-0">/{option.slug}</span>
+              <span className="truncate">{option.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="border-border bg-surface overflow-hidden rounded-3xl border shadow-xs">
         {!compact && (
           <div className="border-border bg-background/60 flex flex-wrap items-center gap-2 border-b px-4 py-3">
@@ -151,11 +236,12 @@ export const ChatComposer = ({
           )}
 
           <textarea
+            ref={textareaRef}
             value={value}
-            onChange={(event) => onChange(event.target.value)}
+            onChange={handleChange}
             onKeyDown={handleKeyDown}
             rows={compact ? 2 : 3}
-            placeholder="Hỏi trợ lý"
+            placeholder="Hỏi trợ lý — gõ / để chọn phòng ban"
             className={`text-foreground placeholder:text-muted w-full resize-none bg-transparent text-lg outline-none ${
               compact ? 'min-h-16' : 'min-h-24'
             }`}
@@ -175,57 +261,14 @@ export const ChatComposer = ({
               </button>
             )}
 
-            {compact && (
-              <button
-                type="button"
-                aria-label="Đính kèm ảnh"
-                onClick={openPicker}
-                className={ROUND_BUTTON_CLASS}
-              >
-                <ImageIcon className="size-5" />
-              </button>
-            )}
-
-            <div className="relative">
-              {scopeOpen && (
-                <>
-                  <button
-                    type="button"
-                    aria-label="Đóng danh sách phòng ban"
-                    onClick={() => setScopeOpen(false)}
-                    className="fixed inset-0 z-10 cursor-default bg-transparent"
-                  />
-                  <div className="bg-surface border-border absolute bottom-full left-0 z-20 mb-2 max-h-72 w-64 overflow-y-auto rounded-xl border p-1 shadow-sm">
-                    {[
-                      { slug: null, name: ALL_DEPARTMENTS },
-                      ...departments,
-                    ].map((option) => (
-                      <button
-                        key={option.slug ?? 'all'}
-                        type="button"
-                        onClick={() => {
-                          onScopeChange(option.slug);
-                          setScopeOpen(false);
-                        }}
-                        className="hover:bg-surface-secondary w-full cursor-pointer rounded-lg bg-transparent px-3 py-2.5 text-left text-sm"
-                      >
-                        {option.name}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              <button
-                type="button"
-                onClick={() => setScopeOpen((open) => !open)}
-                className="border-border hover:bg-surface-secondary flex h-10 cursor-pointer items-center gap-2 rounded-xl border bg-transparent px-3.5 text-sm font-medium"
-              >
-                <DepartmentIcon className="size-4 text-amber-500" />
-                {scopeName}
-                <ChevronDownIcon className="text-muted size-4" />
-              </button>
-            </div>
+            <button
+              type="button"
+              aria-label="Đính kèm ảnh"
+              onClick={openPicker}
+              className={ROUND_BUTTON_CLASS}
+            >
+              <ImageIcon className="size-5" />
+            </button>
           </div>
 
           <div className="flex items-center gap-2">

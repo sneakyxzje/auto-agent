@@ -177,7 +177,6 @@ export const HomeView = () => {
   } = useChat({ onTurnEnd: finishTurn });
 
   const [question, setQuestion] = useState('');
-  const [scope, setScope] = useState<string | null>(null);
   const attachments = useImageAttachments();
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
@@ -206,14 +205,15 @@ export const HomeView = () => {
   const submit = (): void => {
     if (attachments.uploading) return;
 
-    void send(question, scope, attachments.readyIds);
+    void send(question, null, attachments.readyIds);
     setQuestion('');
     attachments.clear();
   };
 
+  const questionText = question.replace(/^\/[a-z0-9-]+\s*/, '').trim();
   const canSend =
     !attachments.uploading &&
-    (question.trim().length > 0 || attachments.readyIds.length > 0);
+    (questionText.length > 0 || attachments.readyIds.length > 0);
 
   const startNew = (): void => {
     reset();
@@ -226,8 +226,6 @@ export const HomeView = () => {
       onChange={setQuestion}
       onSubmit={submit}
       departments={active}
-      scope={scope}
-      onScopeChange={setScope}
       busy={busy}
       images={attachments.images}
       onAddImages={attachments.add}
@@ -243,7 +241,9 @@ export const HomeView = () => {
         <div className="flex items-center gap-2">
           {filter !== null && (
             <span className="flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs text-amber-800">
-              Đang hỏi: {filter.name}
+              Đang hỏi:{' '}
+              {departments.find((department) => department.slug === filter.slug)
+                ?.name ?? filter.name}
               <button
                 type="button"
                 onClick={() => void clearFilter()}
