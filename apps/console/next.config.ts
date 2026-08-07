@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Ẩn header `X-Powered-By` để không lộ stack ra ngoài.
   poweredByHeader: false,
+  // Cho phép truy cập dev server qua tunnel ngrok khi dùng thử nội bộ.
+  allowedDevOrigins: ['*.ngrok-free.app', '*.ngrok.app'],
   experimental: {
     middlewareClientMaxBodySize: '50mb',
   },
