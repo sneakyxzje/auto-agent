@@ -267,11 +267,12 @@ export const HomeView = () => {
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         {empty ? (
-          <div className={`${COLUMN_CLASS} flex flex-col gap-8 pt-14 pb-8`}>
-            <Greetings />
+          <div className="flex min-h-full flex-col justify-center">
+            <div className={`${COLUMN_CLASS} flex flex-col gap-8 py-8`}>
+              <Greetings />
 
-            {composer}
-            {/* <QuickCards /> */}
+              {composer}
+            </div>
           </div>
         ) : (
           <div className={`${COLUMN_CLASS} flex flex-col gap-7 py-6`}>
