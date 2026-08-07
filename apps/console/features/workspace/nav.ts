@@ -17,7 +17,6 @@ export type NavItem = {
   label: string;
   icon: ComponentType<IconProps>;
   ready: boolean;
-  /** Vai trò tối thiểu để thấy mục này. */
   minRole: UserRole;
 };
 
@@ -31,7 +30,7 @@ const SECTIONS: NavSection[] = [
     title: null,
     items: [
       {
-        href: '/',
+        href: '/workspace',
         label: 'Trang chủ',
         icon: HomeIcon,
         ready: true,
@@ -40,32 +39,32 @@ const SECTIONS: NavSection[] = [
     ],
   },
   {
-    title: 'Tri thức',
+    title: 'Chung',
     items: [
       {
-        href: '/departments',
+        href: '/workspace/departments',
         label: 'Phòng ban',
         icon: DepartmentIcon,
         ready: true,
         minRole: 'user',
       },
       {
-        href: '/documents',
+        href: '/workspace/documents',
         label: 'Tài liệu',
         icon: DocumentIcon,
         ready: true,
         minRole: 'user',
       },
       {
-        href: '/escalations',
-        label: 'Phiếu chuyển',
+        href: '/workspace/escalations',
+        label: 'Ticket',
         icon: TicketIcon,
         ready: true,
         minRole: 'manager',
       },
       {
-        href: '/curation',
-        label: 'Duyệt tri thức',
+        href: '/workspace/curation',
+        label: 'Duyệt nội dung',
         icon: ApproveIcon,
         ready: true,
         minRole: 'manager',
@@ -76,14 +75,14 @@ const SECTIONS: NavSection[] = [
     title: 'Quản trị',
     items: [
       {
-        href: '/members',
+        href: '/workspace/members',
         label: 'Thành viên',
         icon: MembersIcon,
         ready: true,
         minRole: 'admin',
       },
       {
-        href: '/dashboard',
+        href: '/workspace/dashboard',
         label: 'Chỉ số',
         icon: ChartIcon,
         ready: false,

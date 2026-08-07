@@ -98,8 +98,8 @@ export const MembersView = () => {
 
   return (
     <PageView
-      title="Thành viên"
-      subtitle="Vai trò quyết định ai được tải tài liệu, trả lời phiếu chuyển và duyệt tri thức vào kho."
+      title='Thành viên'
+      subtitle='Thành viên trong Workspace.'
       action={
         <Button
           onClick={() => {
@@ -107,41 +107,41 @@ export const MembersView = () => {
             setInviteOpen(true);
           }}
         >
-          Mời đồng nghiệp
+          Invite
         </Button>
       }
     >
-      {error !== null && <Alert tone="danger">{error}</Alert>}
+      {error !== null && <Alert tone='danger'>{error}</Alert>}
 
       {loading && members.length === 0 ? (
-        <div className="flex justify-center py-10">
+        <div className='flex justify-center py-10'>
           <Spinner />
         </div>
       ) : (
-        <ul className="border-border divide-separator bg-surface divide-y overflow-hidden rounded-2xl border">
+        <ul className='border-border divide-separator bg-surface divide-y overflow-hidden rounded-2xl border'>
           {members.map((member) => (
             <li
               key={member.id}
-              className="flex items-center justify-between gap-4 px-5 py-4"
+              className='flex items-center justify-between gap-4 px-5 py-4'
             >
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="truncate font-medium">{member.displayName}</p>
+              <div className='min-w-0'>
+                <div className='flex items-center gap-2'>
+                  <p className='truncate font-medium'>{member.displayName}</p>
 
                   {member.id === user.id && (
-                    <span className="border-border text-muted rounded-md border px-1.5 py-0.5 text-xs">
+                    <span className='border-border text-muted rounded-md border px-1.5 py-0.5 text-xs'>
                       bạn
                     </span>
                   )}
                 </div>
 
-                <p className="text-muted mt-0.5 truncate text-sm">
+                <p className='text-muted mt-0.5 truncate text-sm'>
                   {member.email} · đăng nhập gần nhất{' '}
                   {formatDate(member.lastLoginAt)}
                 </p>
               </div>
 
-              <div className="flex shrink-0 items-center gap-3">
+              <div className='flex shrink-0 items-center gap-3'>
                 <span
                   className={`rounded-full px-2.5 py-1 text-xs ${ROLE_TONES[member.role]}`}
                 >
@@ -149,7 +149,7 @@ export const MembersView = () => {
                 </span>
 
                 {member.id === user.id ? (
-                  <span className="text-muted w-56 text-right text-xs">
+                  <span className='text-muted w-56 text-right text-xs'>
                     Nhờ quản trị viên khác đổi giúp
                   </span>
                 ) : (
@@ -159,7 +159,7 @@ export const MembersView = () => {
                     onChange={(event) =>
                       changeRole(member.id, event.target.value)
                     }
-                    className="border-border bg-surface h-10 w-56 cursor-pointer rounded-xl border px-3 text-sm disabled:opacity-50"
+                    className='border-border bg-surface h-10 w-56 cursor-pointer rounded-xl border px-3 text-sm disabled:opacity-50'
                   >
                     {ROLE_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -174,37 +174,32 @@ export const MembersView = () => {
         </ul>
       )}
 
-      <p className="text-muted text-xs">
-        Đổi vai trò sẽ đăng xuất người đó khỏi mọi thiết bị — vai trò nằm trong
-        phiên đăng nhập, không huỷ phiên thì quyền cũ còn hiệu lực thêm 15 phút.
-      </p>
-
       <Dialog
-        title="Mời đồng nghiệp"
-        subtitle="Mã dùng được một lần trong 7 ngày. Người nhận đăng ký tài khoản rồi nhập mã này là vào đúng công ty với vai trò bạn chọn."
+        title='Invite'
+        subtitle='Mã dùng được một lần trong 7 ngày. Yêu cầu người nhận đăng ký tài khoản rồi nhập mã.'
         open={inviteOpen}
         onClose={() => setInviteOpen(false)}
       >
-        <div className="flex flex-col gap-4">
+        <div className='flex flex-col gap-4'>
           <SelectField
-            label="Vai trò khi vào công ty"
-            name="inviteRole"
+            label='Vai trò khi vào công ty'
+            name='inviteRole'
             value={inviteRole}
             options={ROLE_OPTIONS}
             onChange={setInviteRole}
           />
 
           {invitation !== null && (
-            <div className="border-border bg-background rounded-xl border p-4 text-center">
-              <p className="text-muted text-xs">Mã mời</p>
-              <p className="mt-1 font-mono text-2xl tracking-widest">
+            <div className='border-border bg-background rounded-xl border p-4 text-center'>
+              <p className='text-muted text-xs'>Mã mời</p>
+              <p className='mt-1 font-mono text-2xl tracking-widest'>
                 {invitation.code}
               </p>
             </div>
           )}
 
-          <div className="flex justify-end gap-2 pt-1">
-            <Button variant="ghost" onClick={() => setInviteOpen(false)}>
+          <div className='flex justify-end gap-2 pt-1'>
+            <Button variant='ghost' onClick={() => setInviteOpen(false)}>
               Đóng
             </Button>
 

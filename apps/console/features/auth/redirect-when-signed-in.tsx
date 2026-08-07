@@ -10,7 +10,7 @@ export const RedirectWhenSignedIn = ({ children }: { children: ReactNode }) => {
   const { user, loading } = useCurrentUser();
 
   useEffect(() => {
-    if (!loading && user !== null) router.replace('/');
+    if (!loading && user !== null) router.replace('/workspace');
   }, [loading, user, router]);
 
   if (loading || user !== null) {

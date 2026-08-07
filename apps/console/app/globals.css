@@ -16,3 +16,28 @@ body {
   height: 100%;
   font-family: var(--font-sans);
 }
+
+@keyframes thinking-wave {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+
+  50% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.thinking-wave {
+  animation: thinking-wave 900ms ease-in-out infinite;
+}
+
+.thinking-wave-2 {
+  animation-delay: 120ms;
+}
+
+.thinking-wave-3 {
+  animation-delay: 240ms;
+}

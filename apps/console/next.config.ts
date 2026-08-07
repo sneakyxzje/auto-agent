@@ -12,7 +12,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Ẩn header `X-Powered-By` để không lộ stack ra ngoài.
   poweredByHeader: false,
-
+  experimental: {
+    middlewareClientMaxBodySize: '50mb',
+  },
   /**
    * Chạy local thì Next thay vai trò nginx, chuyển tiếp `/api/*` sang cổng 3001.
    * Trình duyệt gọi cùng origin nên không cần CORS, và code phía client giống hệt

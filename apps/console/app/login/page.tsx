@@ -19,7 +19,7 @@ const LoginPage = () => {
     initialValues: { email: '', password: '' },
     onSubmit: async (input) => {
       await login(input);
-      router.push('/');
+      router.push('/workspace');
       router.refresh();
     },
   });
@@ -27,11 +27,11 @@ const LoginPage = () => {
   return (
     <RedirectWhenSignedIn>
       <AuthCard
-        title="Đăng nhập"
-        subtitle="Auto Agent"
+        title='Đăng nhập'
+        subtitle='Auto Agent'
         footer={
           <>
-            Chưa có tài khoản? <Link href="/register">Đăng ký</Link>
+            Chưa có tài khoản? <Link href='/register'>Đăng ký</Link>
           </>
         }
       >
@@ -41,14 +41,14 @@ const LoginPage = () => {
           noValidate
         >
           {form.formError !== null && (
-            <Alert tone="danger">{form.formError}</Alert>
+            <Alert tone='danger'>{form.formError}</Alert>
           )}
 
           <TextField
-            label="Email"
-            name="email"
-            type="email"
-            autoComplete="email"
+            label='Email'
+            name='email'
+            type='email'
+            autoComplete='email'
             value={form.values.email ?? ''}
             onChange={(value) => form.setValue('email', value)}
             error={form.fieldErrors.email}
@@ -56,17 +56,17 @@ const LoginPage = () => {
           />
 
           <TextField
-            label="Mật khẩu"
-            name="password"
-            type="password"
-            autoComplete="current-password"
+            label='Mật khẩu'
+            name='password'
+            type='password'
+            autoComplete='current-password'
             value={form.values.password ?? ''}
             onChange={(value) => form.setValue('password', value)}
             error={form.fieldErrors.password}
             disabled={form.submitting}
           />
 
-          <Button type="submit" block disabled={form.submitting}>
+          <Button type='submit' block disabled={form.submitting}>
             {form.submitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
           </Button>
         </form>

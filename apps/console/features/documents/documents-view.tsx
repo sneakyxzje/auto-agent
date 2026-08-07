@@ -115,27 +115,27 @@ export const DocumentsView = () => {
 
   return (
     <PageView
-      title="Tài liệu"
-      subtitle="Kho tri thức bot dùng để trả lời. Mỗi tài liệu thuộc một phòng ban và có mức đọc riêng."
+      title='Tài liệu'
+      subtitle='Tài liệu agent sử dụng để trả lời.'
       action={
         canManage && departments.length > 0 ? (
-          <Button onClick={() => setFormOpen(true)}>Tải tài liệu lên</Button>
+          <Button onClick={() => setFormOpen(true)}>Upload</Button>
         ) : null
       }
     >
       {departments.length === 0 ? (
-        <p className="text-muted border-border rounded-xl border border-dashed p-8 text-center text-sm">
+        <p className='text-muted border-border rounded-xl border border-dashed p-8 text-center text-sm'>
           Chưa có phòng ban nào — tạo phòng ban trước rồi mới tải tài liệu lên
           được.
         </p>
       ) : (
         <>
           <Dialog
-            title="Tải tài liệu lên"
-            subtitle="Tài liệu thuộc đúng một phòng ban và một mức đọc — hai thứ này quyết định ai hỏi được nội dung trong đó."
+            title='Tải tài liệu lên'
+            subtitle='Tài liệu thuộc đúng một phòng ban và một mức đọc — hai thứ này quyết định ai hỏi được nội dung trong đó.'
             open={formOpen}
             onClose={() => setFormOpen(false)}
-            size="lg"
+            size='lg'
           >
             <UploadForm
               departments={departments.filter(
@@ -146,26 +146,26 @@ export const DocumentsView = () => {
             />
           </Dialog>
 
-          <div className="max-w-xs">
+          <div className='max-w-xs'>
             <SelectField
-              label="Lọc theo phòng ban"
-              name="filter"
+              label='Lọc theo phòng ban'
+              name='filter'
               value={filter}
               options={departments.map((department) => ({
                 value: department.id,
                 label: department.name,
               }))}
               onChange={setFilter}
-              placeholder="Tất cả phòng ban"
+              placeholder='Tất cả phòng ban'
             />
           </div>
 
           {loading && documents.length === 0 ? (
-            <div className="flex justify-center py-10">
+            <div className='flex justify-center py-10'>
               <Spinner />
             </div>
           ) : documents.length === 0 ? (
-            <p className="text-muted border-border rounded-xl border border-dashed p-8 text-center text-sm">
+            <p className='text-muted border-border rounded-xl border border-dashed p-8 text-center text-sm'>
               Chưa có tài liệu nào ở đây.
             </p>
           ) : (
@@ -175,32 +175,32 @@ export const DocumentsView = () => {
               }`}
             >
               {documents.map((document) => (
-                <li key={document.id} className="flex flex-col gap-2 px-5 py-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <p className="truncate font-medium">{document.title}</p>
-                      <p className="text-muted mt-0.5 truncate text-sm">
+                <li key={document.id} className='flex flex-col gap-2 px-5 py-4'>
+                  <div className='flex items-start justify-between gap-4'>
+                    <div className='min-w-0'>
+                      <p className='truncate font-medium'>{document.title}</p>
+                      <p className='text-muted mt-0.5 truncate text-sm'>
                         {document.departmentName} · {document.fileName ?? '—'} ·{' '}
                         {formatSize(document.fileSize)} · bản v
                         {document.version} · {formatDate(document.createdAt)}
                       </p>
                     </div>
 
-                    <div className="flex shrink-0 items-center gap-2">
+                    <div className='flex shrink-0 items-center gap-2'>
                       <a
                         href={documentFileUrl(document.id)}
-                        className="border-border hover:bg-surface-secondary rounded-lg border px-2.5 py-1.5 text-xs"
+                        className='border-border hover:bg-surface-secondary rounded-lg border px-2.5 py-1.5 text-xs'
                       >
                         Tải về
                       </a>
 
                       {canManage && document.status !== 'archived' && (
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => retry(document.id)}
                           disabled={working}
-                          title="Bóc lại text, chia đoạn và tạo embedding từ đầu"
-                          className="border-border hover:bg-surface-secondary cursor-pointer rounded-lg border bg-transparent px-2.5 py-1.5 text-xs disabled:cursor-default disabled:opacity-40"
+                          title='Bóc lại text, chia đoạn và tạo embedding từ đầu'
+                          className='border-border hover:bg-surface-secondary cursor-pointer rounded-lg border bg-transparent px-2.5 py-1.5 text-xs disabled:cursor-default disabled:opacity-40'
                         >
                           {document.ingestStatus === 'pending' ||
                           document.ingestStatus === 'processing'
@@ -211,9 +211,9 @@ export const DocumentsView = () => {
 
                       {canManage && document.status !== 'archived' && (
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => archive(document.id)}
-                          className="border-border text-danger hover:bg-surface-secondary cursor-pointer rounded-lg border bg-transparent px-2.5 py-1.5 text-xs"
+                          className='border-border text-danger hover:bg-surface-secondary cursor-pointer rounded-lg border bg-transparent px-2.5 py-1.5 text-xs'
                         >
                           Gỡ
                         </button>
@@ -221,7 +221,7 @@ export const DocumentsView = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className='flex flex-wrap items-center gap-2'>
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs ${STATUS_TONES[document.status]}`}
                     >
@@ -236,14 +236,14 @@ export const DocumentsView = () => {
                         ` · ${document.chunkCount} đoạn`}
                     </span>
 
-                    <span className="border-border text-muted rounded-full border px-2.5 py-1 text-xs">
+                    <span className='border-border text-muted rounded-full border px-2.5 py-1 text-xs'>
                       {document.audience === 'public'
                         ? 'Khách ngoài đọc được'
                         : 'Chỉ nội bộ'}
                     </span>
 
                     {document.effectiveTo !== null && (
-                      <span className="border-border text-muted rounded-full border px-2.5 py-1 text-xs">
+                      <span className='border-border text-muted rounded-full border px-2.5 py-1 text-xs'>
                         Hết hiệu lực {formatDate(document.effectiveTo)}
                       </span>
                     )}
@@ -252,13 +252,6 @@ export const DocumentsView = () => {
               ))}
             </ul>
           )}
-
-          <p className="text-muted text-xs">
-            Tải lên xong là tài liệu vào hàng đợi xử lý: bóc text, chia đoạn,
-            tạo embedding rồi tự chuyển sang trạng thái dùng được. Bot chỉ trả
-            lời bằng tài liệu đã xử lý xong. Tài liệu đứng mãi ở "Đang chờ xử
-            lý" thường là do worker chưa chạy.
-          </p>
         </>
       )}
     </PageView>

@@ -18,9 +18,8 @@ const RegisterPage = () => {
     schema: registerSchema,
     initialValues: { displayName: '', email: '', password: '' },
     onSubmit: async (input) => {
-      // Đăng ký xong là đã đăng nhập luôn, server cấp token ngay trong phản hồi.
       await register(input);
-      router.push('/');
+      router.push('/workspace');
       router.refresh();
     },
   });
@@ -28,11 +27,11 @@ const RegisterPage = () => {
   return (
     <RedirectWhenSignedIn>
       <AuthCard
-        title="Tạo tài khoản"
-        subtitle="Xong bước này bạn sẽ chọn tạo công ty hoặc nhập mã mời"
+        title='Tạo tài khoản'
+        subtitle='Xong bước này bạn sẽ chọn tạo công ty hoặc nhập mã mời'
         footer={
           <>
-            Đã có tài khoản? <Link href="/login">Đăng nhập</Link>
+            Đã có tài khoản? <Link href='/login'>Đăng nhập</Link>
           </>
         }
       >
@@ -42,13 +41,13 @@ const RegisterPage = () => {
           noValidate
         >
           {form.formError !== null && (
-            <Alert tone="danger">{form.formError}</Alert>
+            <Alert tone='danger'>{form.formError}</Alert>
           )}
 
           <TextField
-            label="Họ tên"
-            name="displayName"
-            autoComplete="name"
+            label='Họ tên'
+            name='displayName'
+            autoComplete='name'
             value={form.values.displayName ?? ''}
             onChange={(value) => form.setValue('displayName', value)}
             error={form.fieldErrors.displayName}
@@ -56,10 +55,10 @@ const RegisterPage = () => {
           />
 
           <TextField
-            label="Email"
-            name="email"
-            type="email"
-            autoComplete="email"
+            label='Email'
+            name='email'
+            type='email'
+            autoComplete='email'
             value={form.values.email ?? ''}
             onChange={(value) => form.setValue('email', value)}
             error={form.fieldErrors.email}
@@ -67,17 +66,17 @@ const RegisterPage = () => {
           />
 
           <TextField
-            label="Mật khẩu"
-            name="password"
-            type="password"
-            autoComplete="new-password"
+            label='Mật khẩu'
+            name='password'
+            type='password'
+            autoComplete='new-password'
             value={form.values.password ?? ''}
             onChange={(value) => form.setValue('password', value)}
             error={form.fieldErrors.password}
             disabled={form.submitting}
           />
 
-          <Button type="submit" block disabled={form.submitting}>
+          <Button type='submit' block disabled={form.submitting}>
             {form.submitting ? 'Đang tạo...' : 'Tạo tài khoản'}
           </Button>
         </form>
