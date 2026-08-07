@@ -18,6 +18,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;
 
   GRANT CONNECT ON DATABASE "${POSTGRES_DB}" TO chatbot_app, chatbot_auth;
+  GRANT CREATE ON DATABASE "${POSTGRES_DB}" TO chatbot_app, "${POSTGRES_USER}";
   GRANT USAGE ON SCHEMA public TO chatbot_app, chatbot_auth;
 
   -- Bảng còn chưa tồn tại lúc này, nên cấp quyền cho mọi bảng sẽ được tạo về sau.
