@@ -100,6 +100,14 @@ export const ChartIcon = ({ className }: IconProps) => (
   </Glyph>
 );
 
+export const Kebab = ({ className }: IconProps) => (
+  <Glyph className={className}>
+    <circle cx="12" cy="5.2" r="1.1" />
+    <circle cx="12" cy="12" r="1.1" />
+    <circle cx="12" cy="18.8" r="1.1" />
+  </Glyph>
+);
+
 export const HelpIcon = ({ className }: IconProps) => (
   <Glyph className={className}>
     <circle cx="12" cy="12" r="8.5" />
@@ -141,6 +149,12 @@ export const MoreIcon = ({ className }: IconProps) => (
 export const PlusIcon = ({ className }: IconProps) => (
   <Glyph className={className}>
     <path d="M12 5v14M5 12h14" />
+  </Glyph>
+);
+
+export const XIcon = ({ className }: IconProps) => (
+  <Glyph className={className}>
+    <path d="m6 6 12 12M18 6 6 18" />
   </Glyph>
 );
 

@@ -2,15 +2,32 @@ import type {
   ChatRequest,
   ConversationSummary,
   ConversationTranscript,
+  ImageAssetSummary,
   SseEvent,
 } from '@chatbot/contracts';
 import {
   API_BASE_URL,
   ApiError,
   apiRequest,
+  deleteRequest,
   patchJson,
+  postForm,
+  postJson,
   refreshSession,
 } from '@/lib/api-client';
+
+export const rateMessage = (
+  messageId: string,
+  rating: 'up' | 'down',
+): Promise<void> =>
+  postJson<void>(`/v1/messages/${messageId}/rate`, { rating });
+
+export const uploadImage = (file: File): Promise<ImageAssetSummary> => {
+  const form = new FormData();
+  form.append('file', file);
+
+  return postForm<ImageAssetSummary>('/v1/images', form);
+};
 
 export const listConversations = (): Promise<ConversationSummary[]> =>
   apiRequest<ConversationSummary[]>('/v1/conversations');
@@ -25,6 +42,9 @@ export const setConversationDepartment = (
   patchJson<ConversationTranscript>(`/v1/conversations/${id}`, {
     departmentSlug,
   });
+
+export const deleteConversation = (id: string): Promise<void> =>
+  deleteRequest<void>(`/v1/conversations/${id}`);
 
 const postChat = (body: ChatRequest, signal: AbortSignal): Promise<Response> =>
   fetch(`${API_BASE_URL}/v1/chat`, {

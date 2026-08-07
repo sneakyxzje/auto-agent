@@ -1,6 +1,13 @@
 'use client';
 
-import { type FormEvent, useState } from 'react';
+import { IMAGE_EXTENSIONS } from '@chatbot/contracts';
+import {
+  type ChangeEvent,
+  type FormEvent,
+  type KeyboardEvent,
+  useRef,
+  useState,
+} from 'react';
 import type { DepartmentSummary } from '@/features/departments/api';
 import {
   ChevronDownIcon,
@@ -11,7 +18,13 @@ import {
   PlusIcon,
   SearchIcon,
   SendIcon,
+  XIcon,
 } from '@/features/workspace/icons';
+import type { PendingImage } from './use-image-attachments';
+
+const ACCEPT_IMAGES = IMAGE_EXTENSIONS.map((extension) => `.${extension}`).join(
+  ',',
+);
 
 const ALL_DEPARTMENTS = 'Tất cả phòng ban';
 
@@ -28,6 +41,10 @@ type ChatComposerProps = {
   scope: string | null;
   onScopeChange: (slug: string | null) => void;
   busy: boolean;
+  images: PendingImage[];
+  onAddImages: (files: File[]) => void;
+  onRemoveImage: (localId: string) => void;
+  canSend: boolean;
   /** Đã vào hội thoại thì bỏ hàng chip trang trí, nhường chỗ cho nội dung. */
   compact?: boolean;
 };
@@ -40,9 +57,14 @@ export const ChatComposer = ({
   scope,
   onScopeChange,
   busy,
+  images,
+  onAddImages,
+  onRemoveImage,
+  canSend,
   compact = false,
 }: ChatComposerProps) => {
   const [scopeOpen, setScopeOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const scopeName =
     departments.find((department) => department.slug === scope)?.name ??
@@ -51,6 +73,26 @@ export const ChatComposer = ({
   const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     onSubmit();
+  };
+
+  const openPicker = (): void => fileInputRef.current?.click();
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>): void => {
+    if (
+      event.key !== 'Enter' ||
+      event.shiftKey ||
+      event.nativeEvent.isComposing
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    if (!busy && canSend) onSubmit();
+  };
+
+  const handleFiles = (event: ChangeEvent<HTMLInputElement>): void => {
+    onAddImages(Array.from(event.target.files ?? []));
+    event.target.value = '';
   };
 
   return (
@@ -62,7 +104,7 @@ export const ChatComposer = ({
               <SearchIcon className="size-4" />
               Tra tài liệu
             </button>
-            <button type="button" className={CHIP_CLASS} title="Sắp có">
+            <button type="button" className={CHIP_CLASS} onClick={openPicker}>
               <ImageIcon className="size-4" />
               Gửi kèm ảnh
             </button>
@@ -70,6 +112,36 @@ export const ChatComposer = ({
               <GridIcon className="size-4" />
               Thêm
             </button>
+          </div>
+        )}
+
+        {images.length > 0 && (
+          <div className="flex flex-wrap gap-2 px-4 pt-4">
+            {images.map((image) => (
+              <div key={image.localId} className="relative">
+                <img
+                  src={image.previewUrl}
+                  alt="Ảnh đính kèm"
+                  className={`size-16 rounded-lg border object-cover ${
+                    image.error === null ? 'border-border' : 'border-red-400'
+                  } ${image.imageId === null && image.error === null ? 'opacity-50' : ''}`}
+                  title={image.error ?? undefined}
+                />
+                {image.imageId === null && image.error === null && (
+                  <span className="absolute inset-0 flex items-center justify-center text-xs">
+                    ...
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => onRemoveImage(image.localId)}
+                  aria-label="Gỡ ảnh"
+                  className="bg-foreground text-background absolute -top-1.5 -right-1.5 flex size-4 cursor-pointer items-center justify-center rounded-full"
+                >
+                  <XIcon className="size-2.5" />
+                </button>
+              </div>
+            ))}
           </div>
         )}
 
@@ -81,8 +153,9 @@ export const ChatComposer = ({
           <textarea
             value={value}
             onChange={(event) => onChange(event.target.value)}
+            onKeyDown={handleKeyDown}
             rows={compact ? 2 : 3}
-            placeholder="Hỏi trợ lý về tài liệu nội bộ..."
+            placeholder="Hỏi trợ lý"
             className={`text-foreground placeholder:text-muted w-full resize-none bg-transparent text-lg outline-none ${
               compact ? 'min-h-16' : 'min-h-24'
             }`}
@@ -99,6 +172,17 @@ export const ChatComposer = ({
                 className={ROUND_BUTTON_CLASS}
               >
                 <PlusIcon className="size-5" />
+              </button>
+            )}
+
+            {compact && (
+              <button
+                type="button"
+                aria-label="Đính kèm ảnh"
+                onClick={openPicker}
+                className={ROUND_BUTTON_CLASS}
+              >
+                <ImageIcon className="size-5" />
               </button>
             )}
 
@@ -159,7 +243,7 @@ export const ChatComposer = ({
             <button
               type="submit"
               aria-label="Gửi câu hỏi"
-              disabled={busy || value.trim().length === 0}
+              disabled={busy || !canSend}
               className="bg-foreground text-background flex size-10 cursor-pointer items-center justify-center rounded-xl disabled:opacity-40"
             >
               <SendIcon className="size-5" />
@@ -167,6 +251,15 @@ export const ChatComposer = ({
           </div>
         </div>
       </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={ACCEPT_IMAGES}
+        multiple
+        hidden
+        onChange={handleFiles}
+      />
     </form>
   );
 };

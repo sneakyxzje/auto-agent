@@ -10,7 +10,6 @@ import {
   PanelLeftIcon,
   PlusIcon,
   ShareIcon,
-  SparkIcon,
 } from './icons';
 import { useWorkspace } from './workspace-context';
 
@@ -60,7 +59,7 @@ export const Topbar = ({ sidebarOpen, onExpand }: TopbarProps) => {
         )}
 
         <Link
-          href="/"
+          href="/workspace?new=1"
           className="bg-surface border-border hover:bg-surface-hover flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm"
         >
           <PlusIcon className="text-muted size-4" />
@@ -74,8 +73,7 @@ export const Topbar = ({ sidebarOpen, onExpand }: TopbarProps) => {
             href="/members"
             className="bg-foreground text-background flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium"
           >
-            <SparkIcon className="size-4" />
-            Mời đồng nghiệp
+            Invite
           </Link>
         )}
 

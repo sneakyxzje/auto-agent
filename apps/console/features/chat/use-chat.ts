@@ -2,7 +2,12 @@
 
 import type { SseEvent } from '@chatbot/contracts';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getTranscript, setConversationDepartment, streamChat } from './api';
+import {
+  getTranscript,
+  rateMessage,
+  setConversationDepartment,
+  streamChat,
+} from './api';
 
 export type SourceRef = {
   chunkId: string;
@@ -16,6 +21,11 @@ export type ChatMessage = {
   role: 'user' | 'assistant';
   content: string;
   sources: SourceRef[];
+  /** Id ảnh đính kèm — hiển thị qua GET /v1/images/:id. */
+  attachments: string[];
+  /** Id thật trong DB — cần để chấm 👍/👎, khác với id cục bộ của lượt. */
+  serverId: string | null;
+  myRating: 'up' | 'down' | null;
   streaming: boolean;
   /** Marker trích dẫn sai, phần đã hiện bị thu hồi. */
   retracted: boolean;
@@ -47,6 +57,9 @@ const blankAssistant = (id: string): ChatMessage => ({
   role: 'assistant',
   content: '',
   sources: [],
+  attachments: [],
+  serverId: null,
+  myRating: null,
   streaming: true,
   retracted: false,
   unverified: false,
@@ -130,9 +143,13 @@ export const useChat = ({
   useEffect(() => stopTicker, [stopTicker]);
 
   const send = useCallback(
-    async (raw: string, departmentSlug: string | null) => {
+    async (
+      raw: string,
+      departmentSlug: string | null,
+      imageIds: string[] = [],
+    ) => {
       const text = raw.trim();
-      if (text.length === 0 || busy) return;
+      if ((text.length === 0 && imageIds.length === 0) || busy) return;
 
       const controller = new AbortController();
       abortRef.current = controller;
@@ -156,6 +173,7 @@ export const useChat = ({
           ...blankAssistant(`local-${askedAt}`),
           role: 'user',
           content: text,
+          attachments: imageIds,
           streaming: false,
         },
         blankAssistant(assistantId),
@@ -167,6 +185,7 @@ export const useChat = ({
         if (event.type === 'start') {
           conversationRef.current = event.conversationId;
           setConversationId(event.conversationId);
+          patchAssistant(assistantId, { serverId: event.messageId });
           return;
         }
 
@@ -209,6 +228,7 @@ export const useChat = ({
               ? {}
               : { conversationId: conversationRef.current }),
             message: text,
+            ...(imageIds.length === 0 ? {} : { imageIds }),
             ...(departmentSlug === null ? {} : { departmentSlug }),
           },
           handle,
@@ -255,6 +275,11 @@ export const useChat = ({
             ...blankAssistant(message.id),
             role: message.role,
             content: message.content,
+            attachments: message.attachments.map(
+              (attachment) => attachment.imageId,
+            ),
+            serverId: message.id,
+            myRating: message.myRating,
             streaming: false,
           })),
         );
@@ -273,6 +298,24 @@ export const useChat = ({
       }
     },
     [stopTicker],
+  );
+
+  const rate = useCallback(
+    async (
+      localId: string,
+      serverId: string,
+      rating: 'up' | 'down',
+      previous: 'up' | 'down' | null,
+    ) => {
+      patchAssistant(localId, { myRating: rating });
+
+      try {
+        await rateMessage(serverId, rating);
+      } catch {
+        patchAssistant(localId, { myRating: previous });
+      }
+    },
+    [patchAssistant],
   );
 
   /** Bấm ✕ trên chip: bỏ lọc ngay lập tức, không đợi lượt hỏi kế tiếp. */
@@ -306,6 +349,7 @@ export const useChat = ({
     conversationId,
     send,
     load,
+    rate,
     clearFilter,
     reset,
   };
