@@ -29,6 +29,9 @@ const ROUND_BUTTON_CLASS =
 /** Lệnh chỉ tính khi đứng đầu ô nhập và chưa có khoảng trắng, khớp cách máy chủ tách lệnh. */
 const COMMAND_PATTERN = /^\/([a-z0-9-]*)$/;
 
+/** Ô nhập cao dần theo nội dung rồi tự cuộn, thay vì chiếm sẵn chỗ khi chưa gõ gì. */
+const MAX_INPUT_HEIGHT = 200;
+
 const ALL_OPTION = { slug: 'all', name: 'Tất cả phòng ban' };
 
 type CommandOption = { slug: string; name: string };
@@ -81,6 +84,14 @@ export const ChatComposer = ({
   useEffect(() => {
     if (open) activeRef.current?.scrollIntoView({ block: 'nearest' });
   }, [open]);
+
+  useEffect(() => {
+    const element = textareaRef.current;
+    if (element === null) return;
+
+    element.style.height = 'auto';
+    element.style.height = `${Math.min(element.scrollHeight, MAX_INPUT_HEIGHT)}px`;
+  }, [value]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
@@ -209,25 +220,19 @@ export const ChatComposer = ({
           </div>
         )}
 
-        <div className="flex gap-3 px-4 pt-4">
-          {!compact && (
-            <span className="mt-1 size-7 shrink-0 rounded-full bg-linear-to-br from-sky-400 via-violet-400 to-amber-300" />
-          )}
-
+        <div className="px-4 pt-3">
           <textarea
             ref={textareaRef}
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            rows={compact ? 2 : 3}
+            rows={1}
             placeholder="Hỏi trợ lý — gõ / để chọn phòng ban"
-            className={`text-foreground placeholder:text-muted w-full resize-none bg-transparent text-lg outline-none ${
-              compact ? 'min-h-16' : 'min-h-24'
-            }`}
+            className="text-foreground placeholder:text-muted max-h-[200px] w-full resize-none bg-transparent text-base outline-none"
           />
         </div>
 
-        <div className="flex items-center justify-between gap-2 px-4 pt-2 pb-4">
+        <div className="flex items-center justify-between gap-2 px-4 pt-1 pb-3">
           <div className="flex items-center gap-2">
             {!compact && (
               <button
