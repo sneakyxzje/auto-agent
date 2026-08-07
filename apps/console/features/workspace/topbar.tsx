@@ -16,6 +16,7 @@ import { useWorkspace } from './workspace-context';
 type TopbarProps = {
   sidebarOpen: boolean;
   onExpand: () => void;
+  onMobileNav: () => void;
 };
 
 const ICON_BUTTON_CLASS =
@@ -38,13 +39,22 @@ const IconAction = ({
   </button>
 );
 
-export const Topbar = ({ sidebarOpen, onExpand }: TopbarProps) => {
+export const Topbar = ({ sidebarOpen, onExpand, onMobileNav }: TopbarProps) => {
   const { user } = useWorkspace();
   const canInvite = hasRole(user.role, 'admin');
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-between gap-4 px-5">
       <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onMobileNav}
+          aria-label="Mở menu"
+          className={`${ICON_BUTTON_CLASS} md:hidden`}
+        >
+          <PanelLeftIcon className="size-4" />
+        </button>
+
         {!sidebarOpen && (
           <span className="hidden md:block">
             <button

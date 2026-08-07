@@ -33,8 +33,7 @@ export const RequireRole = ({
       <p className="text-lg font-medium">Bạn không có quyền xem trang này</p>
       <p className="text-muted text-sm">
         Trang này dành cho {LABELS[minRole]} trở lên. Liên hệ quản trị viên công
-        ty
-        nếu bạn cần quyền truy cập.
+        ty nếu bạn cần quyền truy cập.
       </p>
     </div>
   );

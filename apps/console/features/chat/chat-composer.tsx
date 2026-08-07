@@ -99,7 +99,7 @@ export const ChatComposer = ({
     <form onSubmit={handleSubmit}>
       <div className="border-border bg-surface overflow-hidden rounded-3xl border shadow-xs">
         {!compact && (
-          <div className="border-border bg-background/60 flex items-center gap-2 border-b px-4 py-3">
+          <div className="border-border bg-background/60 flex flex-wrap items-center gap-2 border-b px-4 py-3">
             <button type="button" className={CHIP_CLASS} title="Sắp có">
               <SearchIcon className="size-4" />
               Tra tài liệu
