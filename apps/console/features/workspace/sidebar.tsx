@@ -14,7 +14,7 @@ import {
   HelpIcon,
   type IconProps,
   Kebab,
-  LogoIcon,
+  LogoMark,
   PanelLeftIcon,
   SearchIcon,
   SettingsIcon,
@@ -188,9 +188,7 @@ export const Sidebar = ({ user, onCollapse, onNavigate }: SidebarProps) => {
     <aside className="bg-background flex h-full w-80 max-w-[85vw] shrink-0 flex-col p-3">
       <div className="flex items-center justify-between px-1 py-1.5">
         <div className="flex min-w-0 items-center gap-2">
-          <span className="bg-foreground text-background flex size-7 shrink-0 items-center justify-center rounded-lg">
-            <LogoIcon className="size-4" />
-          </span>
+          <LogoMark className="size-7 shrink-0 rounded-full" />
           <span className="truncate text-sm font-semibold">
             {user.tenant?.name ?? 'Auto Agent'}
           </span>

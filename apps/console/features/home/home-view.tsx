@@ -11,7 +11,7 @@ import { useImageAttachments } from '@/features/chat/use-image-attachments';
 import { useDepartments } from '@/features/departments/use-departments';
 import {
   DocumentIcon,
-  LogoIcon,
+  LogoMark,
   ThumbDownIcon,
   ThumbUpIcon,
 } from '@/features/workspace/icons';
@@ -307,9 +307,7 @@ export const HomeView = () => {
                       : 'items-start'
                   }`}
                 >
-                  <span className="bg-foreground text-background flex size-8 shrink-0 items-center justify-center rounded-lg">
-                    <LogoIcon className="size-4" />
-                  </span>
+                  <LogoMark className="size-8 shrink-0 rounded-full" />
 
                   <div className="flex min-w-0 flex-col gap-2.5">
                     {message.content.length > 0 && (

@@ -19,11 +19,8 @@ const Glyph = ({ className = 'size-4', children }: GlyphProps) => (
   </svg>
 );
 
-export const LogoIcon = ({ className }: IconProps) => (
-  <Glyph className={className}>
-    <circle cx="12" cy="12" r="3.2" />
-    <path d="M12 3v3.4M12 17.6V21M3 12h3.4M17.6 12H21" />
-  </Glyph>
+export const LogoMark = ({ className }: IconProps) => (
+  <img src="/logo.png" alt="Auto Agent" className={className} />
 );
 
 export const PanelLeftIcon = ({ className }: IconProps) => (

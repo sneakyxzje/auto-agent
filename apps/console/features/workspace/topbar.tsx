@@ -1,6 +1,5 @@
 'use client';
 
-import { hasRole } from '@chatbot/contracts';
 import Link from 'next/link';
 import type { ComponentType } from 'react';
 import {
@@ -11,7 +10,6 @@ import {
   PlusIcon,
   ShareIcon,
 } from './icons';
-import { useWorkspace } from './workspace-context';
 
 type TopbarProps = {
   sidebarOpen: boolean;
@@ -40,9 +38,6 @@ const IconAction = ({
 );
 
 export const Topbar = ({ sidebarOpen, onExpand, onMobileNav }: TopbarProps) => {
-  const { user } = useWorkspace();
-  const canInvite = hasRole(user.role, 'admin');
-
   return (
     <header className="flex h-16 shrink-0 items-center justify-between gap-4 px-5">
       <div className="flex items-center gap-2">
@@ -78,15 +73,6 @@ export const Topbar = ({ sidebarOpen, onExpand, onMobileNav }: TopbarProps) => {
       </div>
 
       <div className="flex items-center gap-2">
-        {canInvite && (
-          <Link
-            href="/members"
-            className="bg-foreground text-background flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium"
-          >
-            Invite
-          </Link>
-        )}
-
         <IconAction label="Thông báo" icon={BellIcon} />
         <IconAction label="Chia sẻ" icon={ShareIcon} />
         <IconAction label="Tuỳ chọn khác" icon={MoreIcon} />
